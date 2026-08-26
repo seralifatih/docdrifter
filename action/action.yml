@@ -24,6 +24,10 @@ inputs:
     description: "One-line description of the project, used to steer the LLM"
     required: false
     default: "a software project"
+  skip-labels:
+    description: "Comma-separated PR labels that skip the check entirely, e.g. 'no-docs-needed,dependencies'"
+    required: false
+    default: ""
 
 runs:
   using: "composite"
@@ -38,4 +42,5 @@ runs:
         SRC_PATH: ${{ inputs.src-path }}
         DOCS_PATH: ${{ inputs.docs-path }}
         REPO_DESC: ${{ inputs.repo-description }}
+        SKIP_LABELS: ${{ inputs.skip-labels }}
       run: python3 "${{ github.action_path }}/docdrifter.py"
