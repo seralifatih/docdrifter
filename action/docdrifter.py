@@ -6,11 +6,20 @@ LLM whether docs should have been updated. If yes, posts (or updates) a
 single PR comment flagging it. If the PR already touches docs, or the LLM
 says no, the action stays silent (or removes a stale flag comment).
 
+The actual LLM call happens server-side (DocDrifter's own backend), gated
+on whether the repo is private and, if so, licensed. This action only
+builds the prompts and proves its own identity to that backend via a
+GitHub Actions OIDC token -- it never sees or needs an LLM API key.
+
 Required env vars:
-  GITHUB_TOKEN     - provided automatically by GitHub Actions
-  DEEPSEEK_API_KEY - user-supplied secret
-  GITHUB_REPOSITORY - "owner/repo", provided automatically
-  PR_NUMBER        - the pull request number to check
+  GITHUB_TOKEN       - provided automatically by GitHub Actions
+  GITHUB_REPOSITORY  - "owner/repo", provided automatically
+  PR_NUMBER          - the pull request number to check
+
+Also required (for the OIDC token used to authenticate to DocDrifter's
+backend): the calling workflow must grant `permissions: id-token: write`,
+which makes GitHub populate ACTIONS_ID_TOKEN_REQUEST_URL and
+ACTIONS_ID_TOKEN_REQUEST_TOKEN automatically.
 
 Configured via action inputs (passed as env vars by action.yml):
   SRC_PATH    - path prefix for source files, e.g. "src/"
@@ -22,9 +31,12 @@ import json
 import os
 import re
 import sys
+import urllib.error
 import urllib.request
 
 MARKER = "<!-- docdrifter:comment -->"
+WORKER_URL = "https://docdrifter-api.docdrifter.workers.dev/v1/evaluate"
+OIDC_AUDIENCE = "docdrifter"
 
 SYSTEM_PROMPT_TEMPLATE = """You are a documentation-drift detector for a software \
 project ({repo_desc}).
@@ -126,6 +138,10 @@ def get_pr(repo, pr_number, token):
     return gh_request("GET", f"/repos/{repo}/pulls/{pr_number}", token)
 
 
+def is_repo_private(repo, token):
+    return gh_request("GET", f"/repos/{repo}", token)["private"]
+
+
 def build_user_prompt(title, files, src_path):
     patches = []
     for f in files:
@@ -135,27 +151,57 @@ def build_user_prompt(title, files, src_path):
     return f"PR title: {title}\n\nSource diff:\n{diff_text}"
 
 
-def call_llm(system_prompt, user_prompt, api_key):
+def get_oidc_token():
+    """Fetches a short-lived GitHub Actions OIDC JWT proving this run is
+    executing in the context of GITHUB_REPOSITORY. Requires the calling
+    workflow to have granted `permissions: id-token: write`."""
+    request_url = os.environ.get("ACTIONS_ID_TOKEN_REQUEST_URL")
+    request_token = os.environ.get("ACTIONS_ID_TOKEN_REQUEST_TOKEN")
+    if not request_url or not request_token:
+        return None
+    req = urllib.request.Request(f"{request_url}&audience={OIDC_AUDIENCE}")
+    req.add_header("Authorization", f"Bearer {request_token}")
+    with urllib.request.urlopen(req) as resp:
+        return json.loads(resp.read())["value"]
+
+
+class NotLicensed(Exception):
+    def __init__(self, message, checkout_url):
+        super().__init__(message)
+        self.message = message
+        self.checkout_url = checkout_url
+
+
+def call_worker(system_prompt, user_prompt, repo, is_private, oidc_token):
+    """Calls DocDrifter's backend, which authorizes the request (public repos
+    are always free; private repos need an active subscription) and makes
+    the LLM call on our behalf. Raises NotLicensed on 402, or returns None
+    on any other failure so the caller can skip this run without crashing."""
     req = urllib.request.Request(
-        "https://api.deepseek.com/chat/completions",
+        WORKER_URL,
         data=json.dumps({
-            "model": "deepseek-chat",
-            "messages": [
-                {"role": "system", "content": system_prompt},
-                {"role": "user", "content": user_prompt},
-            ],
-            "temperature": 0,
+            "repo": repo,
+            "is_private": is_private,
+            "system_prompt": system_prompt,
+            "user_prompt": user_prompt,
         }).encode(),
         method="POST",
     )
-    req.add_header("Authorization", f"Bearer {api_key}")
+    req.add_header("Authorization", f"Bearer {oidc_token}")
     req.add_header("Content-Type", "application/json")
-    with urllib.request.urlopen(req) as resp:
-        result = json.loads(resp.read())
-    content = result["choices"][0]["message"]["content"].strip()
-    content = re.sub(r"^```(?:json)?|```$", "", content, flags=re.MULTILINE).strip()
-    parsed = json.loads(content)
-    return parsed["docs_should_update"], parsed.get("reason", "")
+    try:
+        with urllib.request.urlopen(req) as resp:
+            result = json.loads(resp.read())
+        return result["docs_should_update"], result.get("reason", "")
+    except urllib.error.HTTPError as e:
+        body = json.loads(e.read())
+        if e.code == 402:
+            raise NotLicensed(body.get("message", ""), body.get("checkout_url", ""))
+        print(f"  WARN: DocDrifter backend returned {e.code}: {body}", file=sys.stderr)
+        return None
+    except (urllib.error.URLError, json.JSONDecodeError, KeyError) as e:
+        print(f"  WARN: DocDrifter backend call failed: {e}", file=sys.stderr)
+        return None
 
 
 def find_existing_comment(repo, pr_number, token):
@@ -183,7 +229,6 @@ def delete_existing_comment_if_any(repo, pr_number, token):
 
 def main():
     token = env("GITHUB_TOKEN")
-    api_key = env("DEEPSEEK_API_KEY")
     repo = env("GITHUB_REPOSITORY")
     pr_number = env("PR_NUMBER")
     src_path = env("SRC_PATH", required=False, default="src/")
@@ -221,7 +266,34 @@ def main():
     system_prompt = SYSTEM_PROMPT_TEMPLATE.format(repo_desc=repo_desc, docs_path=f"{docs_path}*")
     user_prompt = build_user_prompt(title, files, src_path)
 
-    should_update, reason = call_llm(system_prompt, user_prompt, api_key)
+    oidc_token = get_oidc_token()
+    if not oidc_token:
+        print(
+            "  WARN: no OIDC token available (does the workflow grant "
+            "`permissions: id-token: write`?); skipping this run.",
+            file=sys.stderr,
+        )
+        return
+
+    is_private = is_repo_private(repo, token)
+
+    try:
+        result = call_worker(system_prompt, user_prompt, repo, is_private, oidc_token)
+    except NotLicensed as e:
+        print(f"  repo not licensed: {e.message}")
+        body = (
+            "**DocDrifter: this private repo isn't licensed yet**\n\n"
+            f"{e.message}\n\n"
+            f"[Activate DocDrifter for this repo]({e.checkout_url})"
+        )
+        post_or_update_comment(repo, pr_number, token, body)
+        return
+
+    if result is None:
+        print("  DocDrifter backend call failed, skipping this run.")
+        return
+
+    should_update, reason = result
     print(f"docs_should_update={should_update} reason={reason}")
 
     if should_update:

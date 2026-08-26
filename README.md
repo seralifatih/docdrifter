@@ -30,6 +30,7 @@ on:
 permissions:
   pull-requests: write
   contents: read
+  id-token: write
 
 jobs:
   check-docs:
@@ -38,15 +39,17 @@ jobs:
       - uses: actions/checkout@v4
       - uses: seralifatih/docdrifter/action@v1
         with:
-          deepseek-api-key: ${{ secrets.DEEPSEEK_API_KEY }}
           src-path: "src/"
           docs-path: "docs/"
           repo-description: "describe your project here"
           skip-labels: "no-docs-needed,dependencies" # optional
 ```
 
-Requires a [DeepSeek API key](https://platform.deepseek.com/) added as a repo
-secret.
+No API key to configure — the action proves its identity to DocDrifter's
+backend via a GitHub Actions OIDC token, which is why `id-token: write` is
+required. **Free for public repos.** Private repos need an active
+subscription; if yours isn't licensed yet, DocDrifter will comment on your
+next PR with a link to activate it.
 
 ## Status
 

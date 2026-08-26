@@ -1,0 +1,23 @@
+{
+  "$schema": "node_modules/wrangler/config-schema.json",
+  "name": "docdrifter-api",
+  "main": "src/index.ts",
+  "compatibility_date": "2026-08-26",
+  "compatibility_flags": ["nodejs_compat"],
+  "d1_databases": [
+    {
+      "binding": "DB",
+      "database_name": "docdrifter-db",
+      "database_id": "d1fd42f5-8fbb-4e9a-a814-599280a764b4"
+    }
+  ],
+  "vars": {
+    // Non-secret config. Secrets (DEEPSEEK_API_KEY, PADDLE_WEBHOOK_SECRET,
+    // PADDLE_CLIENT_TOKEN) are set via `wrangler secret put`, not here.
+    "CHECKOUT_BASE_URL": "https://docdrifter-api.<your-subdomain>.workers.dev",
+    "PADDLE_PRICE_ID": "pri_REPLACE_ME"
+  },
+  "observability": {
+    "enabled": true
+  }
+}

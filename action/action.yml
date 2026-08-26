@@ -5,9 +5,6 @@ branding:
   color: "purple"
 
 inputs:
-  deepseek-api-key:
-    description: "DeepSeek API key used to evaluate whether docs should update"
-    required: true
   github-token:
     description: "Token used to read the PR and post comments"
     required: false
@@ -36,7 +33,6 @@ runs:
       shell: bash
       env:
         GITHUB_TOKEN: ${{ inputs.github-token || github.token }}
-        DEEPSEEK_API_KEY: ${{ inputs.deepseek-api-key }}
         GITHUB_REPOSITORY: ${{ github.repository }}
         PR_NUMBER: ${{ github.event.pull_request.number }}
         SRC_PATH: ${{ inputs.src-path }}
