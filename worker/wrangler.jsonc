@@ -14,7 +14,7 @@
   "vars": {
     // Non-secret config. Secrets (DEEPSEEK_API_KEY, PADDLE_WEBHOOK_SECRET,
     // PADDLE_CLIENT_TOKEN) are set via `wrangler secret put`, not here.
-    "CHECKOUT_BASE_URL": "https://docdrifter-api.<your-subdomain>.workers.dev",
+    "CHECKOUT_BASE_URL": "https://docdrifter-api.h-f-ilhan.workers.dev",
     "PADDLE_PRICE_ID": "pri_REPLACE_ME"
   },
   "observability": {
