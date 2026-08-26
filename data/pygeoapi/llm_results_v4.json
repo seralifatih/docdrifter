@@ -1,0 +1,338 @@
+[
+  {
+    "number": 2396,
+    "title": "RFC7: add support for validator plugins",
+    "predicted": true,
+    "actual": true,
+    "reason": "This PR adds a new user-facing validator plugin feature with a new config option ('validator' under provider definitions) and new plugin type, which should be documented in the project's static docs."
+  },
+  {
+    "number": 2358,
+    "title": "Improve CRS support in OAMaps",
+    "predicted": true,
+    "actual": true,
+    "reason": "The PR changes how CRS values are parsed and normalized (replacing the CRS_CODES mapping with new get_uri/get_curie functions), which alters user-facing behavior for CRS input handling and should be reflected in the documentation."
+  },
+  {
+    "number": 2345,
+    "title": "Pooling",
+    "predicted": true,
+    "actual": true,
+    "reason": "The PR adds new user-facing configuration options (pool_size, max_overflow, pool_recycle, pool_timeout, pool_pre_ping) for SQL providers that should be documented in the static docs."
+  },
+  {
+    "number": 2320,
+    "title": "STAC and OAProc fixes",
+    "predicted": true,
+    "actual": true,
+    "reason": "The PR adds a new user-facing configuration option `allow_internal_requests` for processes and introduces SSRF protection behavior that changes how internal HTTP requests are handled, which should be documented in the project's static docs."
+  },
+  {
+    "number": 2308,
+    "title": "Updates to the OGC API - Maps Support",
+    "predicted": true,
+    "actual": true,
+    "reason": "The PR changes the default CRS handling in the Maps API (using storage_crs or CRS84 instead of a fixed default), adds CRS84 support, and modifies the WMS facade's query signature (removing bbox_crs), which are user-visible behavior changes that should be reflected in the documentation."
+  },
+  {
+    "number": 2302,
+    "title": "Fix CRS support on WMS Facade",
+    "predicted": true,
+    "actual": true,
+    "reason": "The PR changes how the 'crs' and 'bbox-crs' query parameters are interpreted (now accepting codes like '4326' and 'EPSG:4326' in addition to URIs) and alters the default bbox_crs behavior to fall back to the collection's crs instead of the global DEFAULT_CRS, which is user-visible behavior that should be documented."
+  },
+  {
+    "number": 2299,
+    "title": "rename base_edr instance functions (#2298)",
+    "predicted": true,
+    "actual": true,
+    "reason": "The PR renames public provider methods `get_instances` and `get_instance` to `instances` and `instance`, which changes the public API surface that external users may call or override, so the documentation should reflect the new method names."
+  },
+  {
+    "number": 2281,
+    "title": "Parquet batch configuration and documentation for spec updates",
+    "predicted": true,
+    "actual": true,
+    "reason": "The PR adds new user-facing configuration options (batch_size and batch_readahead) for the Parquet provider, which should be documented in the provider configuration docs."
+  },
+  {
+    "number": 2274,
+    "title": "OAProc: derive jobControlOptions and outputTransmission from plugin (#2257)",
+    "predicted": true,
+    "actual": true,
+    "reason": "The PR adds new user-facing configuration options (jobControlOptions and outputTransmission) that can be set in process metadata, which should be documented for users."
+  },
+  {
+    "number": 2261,
+    "title": "add resolution/default to collection extents.temporal configuration (#2260)",
+    "predicted": true,
+    "actual": true,
+    "reason": "The PR adds new user-facing configuration options (resolution and default) for collection extents.temporal, which are exposed in the API output and should be documented in the static docs."
+  },
+  {
+    "number": 2258,
+    "title": "PubSub: add support for Kafka (#2259)",
+    "predicted": true,
+    "actual": true,
+    "reason": "This PR adds a new user-facing Kafka pubsub provider and changes the constructor signature of existing HTTP and MQTT clients from broker_url to publisher_def, which are public API changes that should be reflected in the documentation."
+  },
+  {
+    "number": 2251,
+    "title": "Support SQL connection string",
+    "predicted": true,
+    "actual": true,
+    "reason": "The PR adds support for SQL connection strings, a new user-facing configuration option that changes how the PostgreSQL manager and SQL provider accept connection parameters, which should be documented."
+  },
+  {
+    "number": 2220,
+    "title": "add support for OGC API Publish-Subscribe Workflow - Part 1: Core (#2146)",
+    "predicted": true,
+    "actual": true,
+    "reason": "This PR adds a new user-facing feature (OGC API Pub/Sub support) with new configuration options (pubsub section), new endpoints (/asyncapi), and new CLI commands, all of which should be documented in the project's static documentation."
+  },
+  {
+    "number": 2215,
+    "title": "Implement optional count in Feature Providers",
+    "predicted": true,
+    "actual": true,
+    "reason": "The PR adds a new user-facing 'count' configuration option that changes the default behavior of feature providers (numberMatched is now optional), which should be documented in the provider configuration docs."
+  },
+  {
+    "number": 2214,
+    "title": "update EDR and Maps to support MetOcean access and visualization workflows (#2213)",
+    "predicted": true,
+    "actual": true,
+    "reason": "The PR adds new user-facing features (subset and properties parameters for Maps, corridor query support for EDR, new config options for custom dimensions and zarr/squeeze options) that alter public API behavior and configuration, requiring documentation updates."
+  },
+  {
+    "number": 2174,
+    "title": "fix: add fix for slow full count in postgresql",
+    "predicted": true,
+    "actual": true,
+    "reason": "The PR moves the 'count' configuration option from the SQL provider to the base provider, making it a general public configuration option for all providers, which should be documented in the provider configuration docs."
+  },
+  {
+    "number": 2170,
+    "title": "Add CRS parameter support to EDR API",
+    "predicted": true,
+    "actual": true,
+    "reason": "The PR adds a new user-facing 'crs' query parameter to the EDR API, which is a public API behavior change that should be documented in the project's static docs."
+  },
+  {
+    "number": 2167,
+    "title": "Fix WMTSFacade provider",
+    "predicted": false,
+    "actual": true,
+    "reason": "This change adds a configurable style option for the WMTS facade provider, but it is a minor internal implementation detail not documented in the public docs, and no documented default or behavior is changed."
+  },
+  {
+    "number": 2144,
+    "title": "fix support for custom formatters (#1997)",
+    "predicted": true,
+    "actual": true,
+    "reason": "The PR adds a new user-facing 'formatters' configuration option for datasets and changes how custom formatters are exposed in API responses, which should be documented in the static docs."
+  },
+  {
+    "number": 2131,
+    "title": "update MapScript map provider output formats",
+    "predicted": true,
+    "actual": true,
+    "reason": "The PR changes the supported output formats for the MapScript map provider (removing 'png24' and 'gif', adding 'png8', and changing the underlying renderer), which is a user-facing configuration option that should be reflected in the documentation."
+  },
+  {
+    "number": 2129,
+    "title": "add support for STAC API v1.0.0",
+    "predicted": true,
+    "actual": true,
+    "reason": "This PR adds a new public STAC API v1.0.0 endpoint (landing page and search) with new routes and behavior, which is a user-facing feature that should be documented in the project's static documentation."
+  },
+  {
+    "number": 2116,
+    "title": "Normalize CRS handling",
+    "predicted": true,
+    "actual": true,
+    "reason": "The PR moves CRS handling into a new module and changes how storage_crs is parsed/used across providers (e.g., removing source_srs/target_srs from OGRProvider, changing default CRS handling in maps), which alters documented configuration behavior and defaults that users rely on."
+  },
+  {
+    "number": 2092,
+    "title": "enable custom tile matrix sets (#2074)",
+    "predicted": true,
+    "actual": true,
+    "reason": "The PR adds a new user-facing configuration option ('schemes') for custom tile matrix sets in MVT providers, which changes how users configure providers and should be documented."
+  },
+  {
+    "number": 2091,
+    "title": "housekeeping (tests, docs)",
+    "predicted": false,
+    "actual": true,
+    "reason": "This PR is an internal refactor renaming constants (TEMPLATES to TEMPLATESDIR, THISDIR to SCHEMASDIR/DEFINITIONSDIR) and moving resource paths, with no change to public API behavior, configuration options, or documented defaults."
+  },
+  {
+    "number": 2083,
+    "title": "Ensure tile is within configured zoom",
+    "predicted": false,
+    "actual": false,
+    "reason": "The change only enforces an already-documented zoom range constraint in an internal tile validation helper, with no new public API or config option introduced."
+  },
+  {
+    "number": 2341,
+    "title": "Use declarative SQLalchemy Job Table",
+    "predicted": false,
+    "actual": false,
+    "reason": "This is an internal refactor of the PostgreSQL job manager's table model handling with no change to public API behavior, configuration options, or documented defaults."
+  },
+  {
+    "number": 2390,
+    "title": "EDR: add instance link title",
+    "predicted": false,
+    "actual": false,
+    "reason": "The PR only adds a human-readable title to existing link objects in the EDR API response, which is a minor output content change not altering any documented API behavior, defaults, or configuration options."
+  },
+  {
+    "number": 2283,
+    "title": "OAProc: safeguard link rel check (#2282)",
+    "predicted": false,
+    "actual": false,
+    "reason": "This is an internal bug fix in OpenAPI spec generation that changes how an internal link field is read (rel/href instead of type/url), but does not alter any documented public API behavior, config option, or user-facing default."
+  },
+  {
+    "number": 2292,
+    "title": "emit jobs endpoints only when manager supports async (#2291)",
+    "predicted": false,
+    "actual": false,
+    "reason": "The PR only changes runtime output (conditional job links in API responses and templates) based on existing manager async capability, without altering any documented public API signature, config option, or default value."
+  },
+  {
+    "number": 2303,
+    "title": "WMS Facade updates",
+    "predicted": false,
+    "actual": false,
+    "reason": "The changes are internal bug fixes in the WMS facade provider (using .get() with fallback defaults) that do not alter any documented public API behavior, configuration options, or defaults."
+  },
+  {
+    "number": 2338,
+    "title": "fix job start / duration rendering (#2328)",
+    "predicted": false,
+    "actual": false,
+    "reason": "The change only extends internal utility functions to accept datetime objects and fixes timezone handling, with no change to public API behavior, configuration options, or documented defaults."
+  },
+  {
+    "number": 2346,
+    "title": "add translation support for data elements",
+    "predicted": true,
+    "actual": false,
+    "reason": "This PR adds a new user-facing translation feature for data elements via gettext, which changes how string values are interpreted and translated, requiring documentation updates for the new behavior."
+  },
+  {
+    "number": 2119,
+    "title": "add csrf_exempt in view.py (Django)",
+    "predicted": false,
+    "actual": false,
+    "reason": "This is an internal Django view decorator change that doesn't alter the public API surface or documented behavior for pygeoapi users."
+  },
+  {
+    "number": 2357,
+    "title": "EDR: emit data link JSON media type as CoverageJSON",
+    "predicted": true,
+    "actual": false,
+    "reason": "The PR changes the advertised media type for CoverageJSON data links from 'application/prs.coverage+json' to 'application/vnd.cov+json', which is a user-visible output format change that should be reflected in the documentation."
+  },
+  {
+    "number": 2200,
+    "title": "ES: fix property evaluation (#2189)",
+    "predicted": false,
+    "actual": false,
+    "reason": "This is an internal indentation fix in the Elasticsearch provider's query construction that doesn't change any public API behavior, configuration options, or documented defaults."
+  },
+  {
+    "number": 2389,
+    "title": "EDR: fix multilingual instance metadata and links",
+    "predicted": false,
+    "actual": false,
+    "reason": "The PR fixes multilingual metadata and link titles in EDR responses, which is a bug fix making the code match already-documented localization behavior, not a change to public API signatures, config options, or documented defaults."
+  },
+  {
+    "number": 2085,
+    "title": "maintain order of PostgreSQL table columns (#2078)",
+    "predicted": false,
+    "actual": false,
+    "reason": "This PR only changes internal output ordering of properties in SQL provider responses, which is not a documented public API behavior or configuration option."
+  },
+  {
+    "number": 2101,
+    "title": "Raise ProviderTileNotFoundError instead of returning",
+    "predicted": false,
+    "actual": false,
+    "reason": "This is an internal bug fix changing a return to a raise for an error class, with no change to public API behavior, configuration, or documented values."
+  },
+  {
+    "number": 2306,
+    "title": "- fixed bug introduced in previous commit",
+    "predicted": false,
+    "actual": false,
+    "reason": "This is a bug fix correcting an internal variable reference and default value handling in a provider method, with no documented public API behavior or configuration option changed."
+  },
+  {
+    "number": 2296,
+    "title": "update TinyDB query builder",
+    "predicted": false,
+    "actual": false,
+    "reason": "This is an internal refactor of the TinyDB provider's query builder that changes how queries are constructed internally without altering any public API, configuration options, or documented behavior visible to users."
+  },
+  {
+    "number": 2143,
+    "title": "Fix missing types to core pygeoapi",
+    "predicted": false,
+    "actual": false,
+    "reason": "This PR only adds type annotations and minor formatting changes without altering any public API behavior, signatures, defaults, or user-facing functionality."
+  },
+  {
+    "number": 2118,
+    "title": "Catch EDR `AttributeError` errors more fine grained",
+    "predicted": false,
+    "actual": false,
+    "reason": "This is an internal error-handling refactor in a private provider base class that changes exception types for internal query dispatch, with no change to public API signatures, configuration options, or documented behavior."
+  },
+  {
+    "number": 2312,
+    "title": "OAProc: fix binary outputs and non-JSON output (#2304) (#2311)",
+    "predicted": true,
+    "actual": false,
+    "reason": "The PR changes the public behavior of the OGC API Processes jobs listing (removing explicit HTML/JSON result links and using the job's mimetype) and adds new user-facing configuration options (as_bytes, media_type) to the hello_world example process, which are documented in the docs."
+  },
+  {
+    "number": 2201,
+    "title": "set f= in next/prev links (#2175)",
+    "predicted": false,
+    "actual": false,
+    "reason": "This is an internal fix to include the format parameter in pagination links, which is a minor behavior correction not requiring documentation updates."
+  },
+  {
+    "number": 2082,
+    "title": "Align GetTile responses of the WMTS provider with the other tile providers",
+    "predicted": false,
+    "actual": false,
+    "reason": "This PR is an internal refactor that moves helper methods (get_tilematrixset, is_in_limits) from base_mvt.py to the base tile provider and aligns error handling behavior across tile providers without changing any documented public API, configuration options, or user-visible defaults."
+  },
+  {
+    "number": 2090,
+    "title": "Add support for CORS with Django",
+    "predicted": true,
+    "actual": false,
+    "reason": "This PR adds a new user-facing configuration option ('cors' in the server config) that enables CORS support for Django deployments, which should be documented in the project's static docs."
+  },
+  {
+    "number": 2271,
+    "title": "Geoparquet 1.1 spec compliance update",
+    "predicted": false,
+    "actual": false,
+    "reason": "The PR is an internal spec-compliance update to the parquet provider's metadata handling and error handling, with no change to public API signatures, config options, or documented defaults."
+  },
+  {
+    "number": 2094,
+    "title": "Make sure 204 status responses have no body in accordance with HTTP spec",
+    "predicted": false,
+    "actual": false,
+    "reason": "This is an internal bug fix enforcing the HTTP spec for 204 responses, with no change to public API signatures, config options, or documented defaults."
+  }
+]

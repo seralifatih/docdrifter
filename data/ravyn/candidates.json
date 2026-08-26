@@ -1,0 +1,644 @@
+[
+  {
+    "number": 702,
+    "title": "feat!: add HTTP QUERY support",
+    "mergedAt": "2026-07-05T12:43:25Z",
+    "url": "https://github.com/dymmond/ravyn/pull/702",
+    "src_files": [
+      "ravyn/__init__.py",
+      "ravyn/applications.py",
+      "ravyn/contrib/auth/mongoz/base_user.py",
+      "ravyn/contrib/grpc/gateway.py",
+      "ravyn/contrib/grpc/register.py",
+      "ravyn/core/config/csrf.py",
+      "ravyn/core/directives/operations/runserver.py",
+      "ravyn/core/directives/operations/shell/utils.py",
+      "ravyn/core/directives/operations/show_urls.py",
+      "ravyn/core/directives/utils.py",
+      "ravyn/middleware/__init__.py",
+      "ravyn/middleware/authentication.py",
+      "ravyn/openapi/constants.py",
+      "ravyn/openapi/openapi.py",
+      "ravyn/openapi/schemas/__init__.py",
+      "ravyn/openapi/schemas/v3_2_0/__init__.py",
+      "ravyn/openapi/schemas/v3_2_0/open_api.py",
+      "ravyn/openapi/schemas/v3_2_0/path_item.py",
+      "ravyn/openapi/utils.py",
+      "ravyn/permissions/base.py",
+      "ravyn/routing/_decorator_factory.py",
+      "ravyn/routing/controllers/__init__.py",
+      "ravyn/routing/controllers/_metaclasses.py",
+      "ravyn/routing/controllers/base.py",
+      "ravyn/routing/controllers/generics.py",
+      "ravyn/routing/controllers/views.py",
+      "ravyn/routing/core/_internal.py",
+      "ravyn/routing/core/base.py",
+      "ravyn/routing/handlers.py",
+      "ravyn/routing/router.py",
+      "ravyn/routing/webhooks.py",
+      "ravyn/testclient.py",
+      "ravyn/types.py",
+      "ravyn/utils/constants.py",
+      "ravyn/utils/enums.py"
+    ],
+    "docs_files_touched": [
+      "docs/en/docs/databases/mongoz/middleware.md",
+      "docs/en/docs/middleware/authentication.md",
+      "docs/en/docs/middleware/index.md",
+      "docs/en/docs/openapi.md",
+      "docs/en/docs/references/middleware/authentication.md",
+      "docs/en/docs/references/middleware/baseauth.md",
+      "docs/en/docs/references/routing/handlers.md",
+      "docs/en/docs/references/routing/view.md",
+      "docs/en/docs/release-notes.md",
+      "docs/en/docs/routing/controllers.md",
+      "docs/en/docs/routing/handlers.md"
+    ],
+    "ground_truth_docs_affected": true
+  },
+  {
+    "number": 667,
+    "title": "fix asyncz integration",
+    "mergedAt": "2026-03-15T20:18:28Z",
+    "url": "https://github.com/dymmond/ravyn/pull/667",
+    "src_files": [
+      "ravyn/__init__.py",
+      "ravyn/contrib/schedulers/asyncz/config.py"
+    ],
+    "docs_files_touched": [
+      "docs/en/docs/release-notes.md"
+    ],
+    "ground_truth_docs_affected": true
+  },
+  {
+    "number": 665,
+    "title": "Documentation, internals, organisation and tunning",
+    "mergedAt": "2026-03-11T11:14:52Z",
+    "url": "https://github.com/dymmond/ravyn/pull/665",
+    "src_files": [
+      "ravyn/applications.py",
+      "ravyn/conf/global_settings.py",
+      "ravyn/contrib/auth/edgy/middleware.py",
+      "ravyn/contrib/auth/mongoz/middleware.py",
+      "ravyn/contrib/encoding.py",
+      "ravyn/contrib/schedulers/asyncz/config.py",
+      "ravyn/core/caches/memory.py",
+      "ravyn/core/directives/operations/shell/base.py",
+      "ravyn/core/directives/utils.py",
+      "ravyn/core/introspection/__init__.py",
+      "ravyn/core/introspection/_builder.py",
+      "ravyn/core/transformers/signature.py",
+      "ravyn/encoders.py",
+      "ravyn/injector.py",
+      "ravyn/middleware/_exception_handlers.py",
+      "ravyn/middleware/asyncexitstack.py",
+      "ravyn/middleware/exceptions.py",
+      "ravyn/openapi/openapi.py",
+      "ravyn/routing/_decorator_factory.py",
+      "ravyn/routing/handlers.py",
+      "ravyn/routing/router.py",
+      "ravyn/utils/decorators.py"
+    ],
+    "docs_files_touched": [
+      "docs/en/docs/caching.md",
+      "docs/en/docs/dependencies.md",
+      "docs/en/docs/how-to/error-handling.md",
+      "docs/en/docs/how-to/file-uploads.md",
+      "docs/en/docs/how-to/index.md",
+      "docs/en/docs/how-to/websockets.md",
+      "docs/en/docs/middleware/index.md",
+      "docs/en/docs/observables.md",
+      "docs/en/docs/permissions/index.md",
+      "docs/en/docs/routing/routes.md",
+      "docs/en/docs/security/available-security.md",
+      "docs/en/docs/security/interaction.md",
+      "docs/en/docs/testclient.md"
+    ],
+    "ground_truth_docs_affected": true
+  },
+  {
+    "number": 664,
+    "title": "Change parameter name from 'app' to 'config_or_app'",
+    "mergedAt": "2026-03-07T11:51:48Z",
+    "url": "https://github.com/dymmond/ravyn/pull/664",
+    "src_files": [
+      "ravyn/__init__.py",
+      "ravyn/core/directives/operations/runserver.py",
+      "ravyn/routing/router.py"
+    ],
+    "docs_files_touched": [
+      "docs/en/docs/release-notes.md"
+    ],
+    "ground_truth_docs_affected": true
+  },
+  {
+    "number": 659,
+    "title": "Release 0.3.9",
+    "mergedAt": "2026-03-04T19:52:31Z",
+    "url": "https://github.com/dymmond/ravyn/pull/659",
+    "src_files": [
+      "ravyn/__init__.py"
+    ],
+    "docs_files_touched": [
+      "docs/en/docs/contributing.md",
+      "docs/en/docs/index.md",
+      "docs/en/docs/release-notes.md",
+      "docs/en/docs/statics/css/custom.css",
+      "docs/en/docs/statics/css/extra.css"
+    ],
+    "ground_truth_docs_affected": true
+  },
+  {
+    "number": 658,
+    "title": "Update docs to Palfrey and runserver",
+    "mergedAt": "2026-03-04T01:01:32Z",
+    "url": "https://github.com/dymmond/ravyn/pull/658",
+    "src_files": [
+      "ravyn/core/directives/operations/runserver.py",
+      "ravyn/core/terminal/utils.py"
+    ],
+    "docs_files_touched": [
+      "docs/en/docs/application/settings.md",
+      "docs/en/docs/deployment/docker.md",
+      "docs/en/docs/deployment/index.md",
+      "docs/en/docs/deployment/intro.md",
+      "docs/en/docs/directives/directives.md",
+      "docs/en/docs/directives/discovery.md",
+      "docs/en/docs/guides/beginner/02-building-your-first-api.md",
+      "docs/en/docs/guides/index.md",
+      "docs/en/docs/guides/more-advanced/03-deployment.md",
+      "docs/en/docs/guides/more-advanced/04-scaling.md",
+      "docs/en/docs/index.md",
+      "docs/en/docs/interceptors.md",
+      "docs/en/docs/middleware/index.md",
+      "docs/en/docs/release-notes.md",
+      "docs/en/docs/security/introduction.md",
+      "docs/en/docs/troubleshooting.md"
+    ],
+    "ground_truth_docs_affected": true
+  },
+  {
+    "number": 656,
+    "title": "Move to ty",
+    "mergedAt": "2026-02-25T23:36:55Z",
+    "url": "https://github.com/dymmond/ravyn/pull/656",
+    "src_files": [
+      "ravyn/core/config/openapi.py",
+      "ravyn/core/config/session.py",
+      "ravyn/core/config/static_files.py",
+      "ravyn/core/directives/operations/runserver.py",
+      "ravyn/core/directives/templates.py",
+      "ravyn/core/transformers/signature.py",
+      "ravyn/middleware/exceptions.py",
+      "ravyn/openapi/openapi.py",
+      "ravyn/permissions/utils.py",
+      "ravyn/routing/controllers/base.py",
+      "ravyn/routing/core/_internal.py",
+      "ravyn/routing/core/base.py"
+    ],
+    "docs_files_touched": [],
+    "ground_truth_docs_affected": false
+  },
+  {
+    "number": 655,
+    "title": "Improve performance and reorganise code",
+    "mergedAt": "2026-02-09T11:12:24Z",
+    "url": "https://github.com/dymmond/ravyn/pull/655",
+    "src_files": [
+      "ravyn/__init__.py",
+      "ravyn/applications.py",
+      "ravyn/conf/global_settings.py",
+      "ravyn/middleware/asyncexitstack.py",
+      "ravyn/middleware/exceptions.py",
+      "ravyn/routing/core/base.py",
+      "ravyn/routing/router.py"
+    ],
+    "docs_files_touched": [
+      "docs/en/docs/release-notes.md"
+    ],
+    "ground_truth_docs_affected": true
+  },
+  {
+    "number": 654,
+    "title": "Templating and Lilya upgrade",
+    "mergedAt": "2026-02-09T09:50:31Z",
+    "url": "https://github.com/dymmond/ravyn/pull/654",
+    "src_files": [
+      "ravyn/applications.py"
+    ],
+    "docs_files_touched": [
+      "docs/en/docs/directives/directives.md",
+      "docs/en/docs/release-notes.md"
+    ],
+    "ground_truth_docs_affected": true
+  },
+  {
+    "number": 653,
+    "title": "Fix the way exception_handlers are evaluated",
+    "mergedAt": "2026-01-27T14:17:04Z",
+    "url": "https://github.com/dymmond/ravyn/pull/653",
+    "src_files": [
+      "ravyn/applications.py"
+    ],
+    "docs_files_touched": [
+      "docs/en/docs/release-notes.md"
+    ],
+    "ground_truth_docs_affected": true
+  },
+  {
+    "number": 652,
+    "title": "Update templates and transformer + internal updates",
+    "mergedAt": "2026-01-27T13:11:17Z",
+    "url": "https://github.com/dymmond/ravyn/pull/652",
+    "src_files": [
+      "ravyn/__init__.py",
+      "ravyn/core/directives/operations/createapp.py",
+      "ravyn/core/directives/operations/createproject.py",
+      "ravyn/core/directives/operations/mail.py",
+      "ravyn/core/transformers/signature.py"
+    ],
+    "docs_files_touched": [
+      "docs/en/docs/ravyn-people.md",
+      "docs/en/docs/release-notes.md"
+    ],
+    "ground_truth_docs_affected": true
+  },
+  {
+    "number": 650,
+    "title": "CQRS and Introspection",
+    "mergedAt": "2026-01-14T14:58:41Z",
+    "url": "https://github.com/dymmond/ravyn/pull/650",
+    "src_files": [
+      "ravyn/__init__.py",
+      "ravyn/applications.py",
+      "ravyn/contrib/cqrs/__init__.py",
+      "ravyn/core/instrospection/__init__.py",
+      "ravyn/core/instrospection/_builder.py"
+    ],
+    "docs_files_touched": [
+      "docs/en/docs/contrib/cqrs.md",
+      "docs/en/docs/introspection.md",
+      "docs/en/docs/release-notes.md"
+    ],
+    "ground_truth_docs_affected": true
+  },
+  {
+    "number": 643,
+    "title": "Add original to scheduler",
+    "mergedAt": "2025-12-02T11:28:40Z",
+    "url": "https://github.com/dymmond/ravyn/pull/643",
+    "src_files": [
+      "ravyn/contrib/schedulers/asyncz/config.py"
+    ],
+    "docs_files_touched": [
+      "docs/en/docs/release-notes.md"
+    ],
+    "ground_truth_docs_affected": true
+  },
+  {
+    "number": 642,
+    "title": "Release 0.3.4",
+    "mergedAt": "2025-12-01T11:40:57Z",
+    "url": "https://github.com/dymmond/ravyn/pull/642",
+    "src_files": [
+      "ravyn/__init__.py",
+      "ravyn/core/directives/utils.py"
+    ],
+    "docs_files_touched": [
+      "docs/en/docs/release-notes.md",
+      "docs/en/docs/routing/router.md"
+    ],
+    "ground_truth_docs_affected": true
+  },
+  {
+    "number": 636,
+    "title": "Add url_path_for",
+    "mergedAt": "2025-11-11T15:11:37Z",
+    "url": "https://github.com/dymmond/ravyn/pull/636",
+    "src_files": [
+      "ravyn/__init__.py",
+      "ravyn/applications.py",
+      "ravyn/requests.py",
+      "ravyn/routing/gateways.py",
+      "ravyn/routing/handlers.py",
+      "ravyn/routing/router.py",
+      "ravyn/testclient.py"
+    ],
+    "docs_files_touched": [
+      "docs/en/docs/references/ravyn.md",
+      "docs/en/docs/release-notes.md",
+      "docs/en/docs/routing/router.md"
+    ],
+    "ground_truth_docs_affected": true
+  },
+  {
+    "number": 633,
+    "title": "Fix hot path of the transformation",
+    "mergedAt": "2025-11-10T11:31:04Z",
+    "url": "https://github.com/dymmond/ravyn/pull/633",
+    "src_files": [
+      "ravyn/__init__.py",
+      "ravyn/applications.py",
+      "ravyn/responses/mixins.py",
+      "ravyn/routing/controllers/base.py",
+      "ravyn/routing/router.py"
+    ],
+    "docs_files_touched": [
+      "docs/en/docs/release-notes.md"
+    ],
+    "ground_truth_docs_affected": true
+  },
+  {
+    "number": 630,
+    "title": "Permissions and Gateways",
+    "mergedAt": "2025-11-03T17:57:46Z",
+    "url": "https://github.com/dymmond/ravyn/pull/630",
+    "src_files": [
+      "ravyn/__init__.py",
+      "ravyn/permissions/base.py",
+      "ravyn/routing/gateways.py"
+    ],
+    "docs_files_touched": [
+      "docs/en/docs/release-notes.md"
+    ],
+    "ground_truth_docs_affected": true
+  },
+  {
+    "number": 629,
+    "title": "Tests and permissions",
+    "mergedAt": "2025-11-01T19:22:06Z",
+    "url": "https://github.com/dymmond/ravyn/pull/629",
+    "src_files": [
+      "ravyn/__init__.py",
+      "ravyn/applications.py",
+      "ravyn/openapi/openapi.py",
+      "ravyn/openapi/schemas/v3_1_0/info.py",
+      "ravyn/openapi/utils.py",
+      "ravyn/permissions/utils.py",
+      "ravyn/routing/controllers/base.py",
+      "ravyn/routing/core/_internal.py",
+      "ravyn/routing/gateways.py",
+      "ravyn/routing/router.py"
+    ],
+    "docs_files_touched": [
+      "docs/en/docs/permissions/index.md",
+      "docs/en/docs/permissions/lilya.md",
+      "docs/en/docs/release-notes.md"
+    ],
+    "ground_truth_docs_affected": true
+  },
+  {
+    "number": 627,
+    "title": "Fix permissions operations AND,OR,NOT.",
+    "mergedAt": "2025-11-01T11:33:11Z",
+    "url": "https://github.com/dymmond/ravyn/pull/627",
+    "src_files": [
+      "ravyn/permissions/utils.py"
+    ],
+    "docs_files_touched": [],
+    "ground_truth_docs_affected": false
+  },
+  {
+    "number": 626,
+    "title": "Update imports and add argument to runserver command",
+    "mergedAt": "2025-10-16T13:55:56Z",
+    "url": "https://github.com/dymmond/ravyn/pull/626",
+    "src_files": [
+      "ravyn/conf/global_settings.py",
+      "ravyn/core/directives/operations/runserver.py",
+      "ravyn/core/terminal/utils.py"
+    ],
+    "docs_files_touched": [
+      "docs/en/docs/release-notes.md"
+    ],
+    "ground_truth_docs_affected": true
+  },
+  {
+    "number": 625,
+    "title": "Fix query string parsing and docs",
+    "mergedAt": "2025-10-15T14:21:55Z",
+    "url": "https://github.com/dymmond/ravyn/pull/625",
+    "src_files": [
+      "ravyn/__init__.py",
+      "ravyn/core/transformers/utils.py"
+    ],
+    "docs_files_touched": [
+      "docs/en/docs/extras/query-params.md",
+      "docs/en/docs/release-notes.md"
+    ],
+    "ground_truth_docs_affected": true
+  },
+  {
+    "number": 624,
+    "title": "Update import paths for context and injector",
+    "mergedAt": "2025-10-15T14:19:16Z",
+    "url": "https://github.com/dymmond/ravyn/pull/624",
+    "src_files": [
+      "ravyn/__init__.py"
+    ],
+    "docs_files_touched": [],
+    "ground_truth_docs_affected": false
+  },
+  {
+    "number": 623,
+    "title": "Fix overriding responses for encoding types",
+    "mergedAt": "2025-10-14T16:40:00Z",
+    "url": "https://github.com/dymmond/ravyn/pull/623",
+    "src_files": [
+      "ravyn/routing/core/base.py",
+      "ravyn/routing/handlers.py",
+      "ravyn/routing/router.py"
+    ],
+    "docs_files_touched": [
+      "docs/en/docs/release-notes.md"
+    ],
+    "ground_truth_docs_affected": true
+  },
+  {
+    "number": 622,
+    "title": "Update internals to start using AuthenticationMiddleware from Lilya as the main recommendation",
+    "mergedAt": "2025-10-14T15:41:08Z",
+    "url": "https://github.com/dymmond/ravyn/pull/622",
+    "src_files": [
+      "ravyn/__init__.py",
+      "ravyn/contrib/auth/common/middleware.py",
+      "ravyn/contrib/auth/edgy/middleware.py",
+      "ravyn/contrib/auth/mongoz/middleware.py",
+      "ravyn/middleware/authentication.py"
+    ],
+    "docs_files_touched": [
+      "docs/en/docs/databases/edgy/middleware.md",
+      "docs/en/docs/databases/edgy/models.md",
+      "docs/en/docs/databases/mongoz/documents.md",
+      "docs/en/docs/middleware/authentication.md",
+      "docs/en/docs/middleware/middleware.md",
+      "docs/en/docs/references/middleware/authentication.md",
+      "docs/en/docs/release-notes.md"
+    ],
+    "ground_truth_docs_affected": true
+  },
+  {
+    "number": 620,
+    "title": "Update injector to start using Lilya DI",
+    "mergedAt": "2025-10-12T22:47:42Z",
+    "url": "https://github.com/dymmond/ravyn/pull/620",
+    "src_files": [
+      "ravyn/__init__.py",
+      "ravyn/contrib/grpc/gateway.py",
+      "ravyn/core/transformers/signature.py",
+      "ravyn/exception_handlers.py",
+      "ravyn/exceptions.py",
+      "ravyn/injector.py",
+      "ravyn/middleware/exceptions.py",
+      "ravyn/openapi/openapi.py",
+      "ravyn/params.py",
+      "ravyn/responses/__init__.py",
+      "ravyn/responses/base.py",
+      "ravyn/routing/core/_internal.py",
+      "ravyn/utils/schema.py"
+    ],
+    "docs_files_touched": [
+      "docs/en/docs/references/injector.md",
+      "docs/en/docs/release-notes.md"
+    ],
+    "ground_truth_docs_affected": true
+  },
+  {
+    "number": 619,
+    "title": "Add response parameter to exception initialization",
+    "mergedAt": "2025-10-10T14:48:26Z",
+    "url": "https://github.com/dymmond/ravyn/pull/619",
+    "src_files": [
+      "ravyn/exceptions.py"
+    ],
+    "docs_files_touched": [
+      "docs/en/docs/release-notes.md"
+    ],
+    "ground_truth_docs_affected": true
+  },
+  {
+    "number": 618,
+    "title": "Python 3.14",
+    "mergedAt": "2025-10-10T14:27:49Z",
+    "url": "https://github.com/dymmond/ravyn/pull/618",
+    "src_files": [
+      "ravyn/__init__.py",
+      "ravyn/contrib/auth/edgy/base_user.py",
+      "ravyn/contrib/auth/mongoz/base_user.py",
+      "ravyn/contrib/responses/shortcuts.py",
+      "ravyn/responses/__init__.py",
+      "ravyn/routing/controllers/base.py"
+    ],
+    "docs_files_touched": [
+      "docs/en/docs/contrib/shortcuts/abort.md",
+      "docs/en/docs/contrib/shortcuts/responses.md",
+      "docs/en/docs/release-notes.md"
+    ],
+    "ground_truth_docs_affected": true
+  },
+  {
+    "number": 617,
+    "title": "Update docstring of handlers",
+    "mergedAt": "2025-10-07T17:59:35Z",
+    "url": "https://github.com/dymmond/ravyn/pull/617",
+    "src_files": [
+      "ravyn/__init__.py",
+      "ravyn/applications.py",
+      "ravyn/conf/global_settings.py",
+      "ravyn/core/directives/operations/show_urls.py",
+      "ravyn/permissions/base.py",
+      "ravyn/permissions/utils.py",
+      "ravyn/routing/apis/__init__.py",
+      "ravyn/routing/apis/generics.py",
+      "ravyn/routing/controllers/__init__.py",
+      "ravyn/routing/controllers/_metaclasses.py",
+      "ravyn/routing/controllers/_mixins.py",
+      "ravyn/routing/controllers/base.py",
+      "ravyn/routing/controllers/generics.py",
+      "ravyn/routing/controllers/views.py",
+      "ravyn/routing/core/base.py",
+      "ravyn/routing/gateways.py",
+      "ravyn/routing/handlers.py",
+      "ravyn/routing/router.py",
+      "ravyn/routing/webhooks.py",
+      "ravyn/routing/webhooks/__init__.py",
+      "ravyn/routing/webhooks/handlers.py",
+      "ravyn/testclient.py",
+      "ravyn/types.py",
+      "ravyn/utils/decorators.py"
+    ],
+    "docs_files_touched": [
+      "docs/en/docs/configurations/openapi/config.md",
+      "docs/en/docs/decorators.md",
+      "docs/en/docs/guides/beginner/05-routing.md",
+      "docs/en/docs/permissions/ravyn.md",
+      "docs/en/docs/references/ravyn.md",
+      "docs/en/docs/references/routing/router.md",
+      "docs/en/docs/references/routing/view.md",
+      "docs/en/docs/release-notes.md",
+      "docs/en/docs/routing/controllers.md",
+      "docs/en/docs/routing/webhooks.md",
+      "docs/en/docs/security/advanced/oauth2-scopes.md"
+    ],
+    "ground_truth_docs_affected": true
+  },
+  {
+    "number": 616,
+    "title": "Update runserver to reflect Ravyn colours",
+    "mergedAt": "2025-10-07T08:07:31Z",
+    "url": "https://github.com/dymmond/ravyn/pull/616",
+    "src_files": [
+      "ravyn/__init__.py",
+      "ravyn/core/directives/operations/runserver.py",
+      "ravyn/core/terminal/utils.py"
+    ],
+    "docs_files_touched": [
+      "docs/en/docs/release-notes.md"
+    ],
+    "ground_truth_docs_affected": true
+  },
+  {
+    "number": 613,
+    "title": "Reaming, fixes and internals",
+    "mergedAt": "2025-10-06T12:26:12Z",
+    "url": "https://github.com/dymmond/ravyn/pull/613",
+    "src_files": [
+      "ravyn/applications.py",
+      "ravyn/core/directives/constants.py",
+      "ravyn/core/directives/env.py",
+      "ravyn/core/directives/exceptions.py",
+      "ravyn/core/directives/operations/run.py",
+      "ravyn/core/directives/operations/runserver.py",
+      "ravyn/core/directives/operations/show_urls.py",
+      "ravyn/exceptions.py",
+      "ravyn/middleware/exceptions.py",
+      "ravyn/openapi/responses.py"
+    ],
+    "docs_files_touched": [
+      "docs/en/docs/directives/custom-directives.md",
+      "docs/en/docs/directives/directive-decorator.md",
+      "docs/en/docs/directives/directives.md",
+      "docs/en/docs/directives/discovery.md",
+      "docs/en/docs/directives/shell.md",
+      "docs/en/docs/index.md",
+      "docs/en/docs/middleware/middleware.md",
+      "docs/en/docs/release-notes.md",
+      "docs/en/docs/routing/routes.md",
+      "docs/en/docs/wsgi.md"
+    ],
+    "ground_truth_docs_affected": true
+  },
+  {
+    "number": 599,
+    "title": "generic lifespan support",
+    "mergedAt": "2025-10-05T21:22:28Z",
+    "url": "https://github.com/dymmond/ravyn/pull/599",
+    "src_files": [
+      "ravyn/core/directives/operations/run.py"
+    ],
+    "docs_files_touched": [
+      "docs/en/docs/release-notes.md"
+    ],
+    "ground_truth_docs_affected": true
+  }
+]

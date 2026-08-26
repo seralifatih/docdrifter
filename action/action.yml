@@ -1,0 +1,41 @@
+name: "DocDrifter"
+description: "Flags pull requests that change source code without updating docs"
+branding:
+  icon: "book-open"
+  color: "purple"
+
+inputs:
+  deepseek-api-key:
+    description: "DeepSeek API key used to evaluate whether docs should update"
+    required: true
+  github-token:
+    description: "Token used to read the PR and post comments"
+    required: false
+    default: ${{ github.token }}
+  src-path:
+    description: "Path prefix that counts as source code, e.g. src/"
+    required: false
+    default: "src/"
+  docs-path:
+    description: "Path prefix that counts as documentation, e.g. docs/"
+    required: false
+    default: "docs/"
+  repo-description:
+    description: "One-line description of the project, used to steer the LLM"
+    required: false
+    default: "a software project"
+
+runs:
+  using: "composite"
+  steps:
+    - name: Run DocDrifter
+      shell: bash
+      env:
+        GITHUB_TOKEN: ${{ inputs.github-token }}
+        DEEPSEEK_API_KEY: ${{ inputs.deepseek-api-key }}
+        GITHUB_REPOSITORY: ${{ github.repository }}
+        PR_NUMBER: ${{ github.event.pull_request.number }}
+        SRC_PATH: ${{ inputs.src-path }}
+        DOCS_PATH: ${{ inputs.docs-path }}
+        REPO_DESC: ${{ inputs.repo-description }}
+      run: python3 "${{ github.action_path }}/docdrifter.py"

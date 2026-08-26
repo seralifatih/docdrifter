@@ -1,0 +1,717 @@
+[
+  {
+    "number": 2396,
+    "title": "RFC7: add support for validator plugins",
+    "mergedAt": "2026-08-18T22:37:16Z",
+    "url": "https://github.com/geopython/pygeoapi/pull/2396",
+    "src_files": [
+      "pygeoapi/api/itemtypes.py",
+      "pygeoapi/plugin.py",
+      "pygeoapi/provider/base.py",
+      "pygeoapi/validator/__init__.py",
+      "pygeoapi/validator/base.py",
+      "pygeoapi/validator/geojson.py"
+    ],
+    "docs_files_touched": [
+      "docs/source/configuration.rst",
+      "docs/source/cql2.rst",
+      "docs/source/plugins.rst",
+      "docs/source/transactions.rst"
+    ],
+    "ground_truth_docs_affected": true
+  },
+  {
+    "number": 2358,
+    "title": "Improve CRS support in OAMaps",
+    "mergedAt": "2026-06-22T12:04:43Z",
+    "url": "https://github.com/geopython/pygeoapi/pull/2358",
+    "src_files": [
+      "pygeoapi/api/maps.py",
+      "pygeoapi/crs.py",
+      "pygeoapi/provider/wms_facade.py"
+    ],
+    "docs_files_touched": [
+      "docs/source/publishing/ogcapi-maps.rst"
+    ],
+    "ground_truth_docs_affected": true
+  },
+  {
+    "number": 2345,
+    "title": "Pooling",
+    "mergedAt": "2026-06-09T09:10:12Z",
+    "url": "https://github.com/geopython/pygeoapi/pull/2345",
+    "src_files": [
+      "pygeoapi/provider/sql.py"
+    ],
+    "docs_files_touched": [
+      "docs/source/publishing/ogcapi-features.rst"
+    ],
+    "ground_truth_docs_affected": true
+  },
+  {
+    "number": 2320,
+    "title": "STAC and OAProc fixes",
+    "mergedAt": "2026-04-22T02:02:14Z",
+    "url": "https://github.com/geopython/pygeoapi/pull/2320",
+    "src_files": [
+      "pygeoapi/process/base.py",
+      "pygeoapi/process/manager/base.py",
+      "pygeoapi/provider/filesystem.py",
+      "pygeoapi/util.py"
+    ],
+    "docs_files_touched": [
+      "docs/source/configuration.rst"
+    ],
+    "ground_truth_docs_affected": true
+  },
+  {
+    "number": 2308,
+    "title": "Updates to the OGC API - Maps Support",
+    "mergedAt": "2026-05-06T09:43:56Z",
+    "url": "https://github.com/geopython/pygeoapi/pull/2308",
+    "src_files": [
+      "pygeoapi/api/maps.py",
+      "pygeoapi/crs.py",
+      "pygeoapi/provider/wms_facade.py"
+    ],
+    "docs_files_touched": [
+      "docs/source/publishing/ogcapi-maps.rst"
+    ],
+    "ground_truth_docs_affected": true
+  },
+  {
+    "number": 2302,
+    "title": "Fix CRS support on WMS Facade",
+    "mergedAt": "2026-03-26T16:33:45Z",
+    "url": "https://github.com/geopython/pygeoapi/pull/2302",
+    "src_files": [
+      "pygeoapi/api/maps.py",
+      "pygeoapi/provider/wms_facade.py"
+    ],
+    "docs_files_touched": [
+      "docs/source/publishing/ogcapi-maps.rst"
+    ],
+    "ground_truth_docs_affected": true
+  },
+  {
+    "number": 2299,
+    "title": "rename base_edr instance functions (#2298)",
+    "mergedAt": "2026-03-26T13:08:11Z",
+    "url": "https://github.com/geopython/pygeoapi/pull/2299",
+    "src_files": [
+      "pygeoapi/api/environmental_data_retrieval.py",
+      "pygeoapi/provider/base_edr.py"
+    ],
+    "docs_files_touched": [
+      "docs/source/plugins.rst"
+    ],
+    "ground_truth_docs_affected": true
+  },
+  {
+    "number": 2281,
+    "title": "Parquet batch configuration and documentation for spec updates",
+    "mergedAt": "2026-03-10T15:07:54Z",
+    "url": "https://github.com/geopython/pygeoapi/pull/2281",
+    "src_files": [
+      "pygeoapi/provider/parquet.py"
+    ],
+    "docs_files_touched": [
+      "docs/source/publishing/ogcapi-features.rst"
+    ],
+    "ground_truth_docs_affected": true
+  },
+  {
+    "number": 2274,
+    "title": "OAProc: derive jobControlOptions and outputTransmission from plugin (#2257)",
+    "mergedAt": "2026-03-06T21:00:21Z",
+    "url": "https://github.com/geopython/pygeoapi/pull/2274",
+    "src_files": [
+      "pygeoapi/api/processes.py"
+    ],
+    "docs_files_touched": [
+      "docs/source/plugins.rst"
+    ],
+    "ground_truth_docs_affected": true
+  },
+  {
+    "number": 2261,
+    "title": "add resolution/default to collection extents.temporal configuration (#2260)",
+    "mergedAt": "2026-02-23T02:20:28Z",
+    "url": "https://github.com/geopython/pygeoapi/pull/2261",
+    "src_files": [
+      "pygeoapi/api/__init__.py"
+    ],
+    "docs_files_touched": [
+      "docs/source/configuration.rst"
+    ],
+    "ground_truth_docs_affected": true
+  },
+  {
+    "number": 2258,
+    "title": "PubSub: add support for Kafka (#2259)",
+    "mergedAt": "2026-02-24T13:36:52Z",
+    "url": "https://github.com/geopython/pygeoapi/pull/2258",
+    "src_files": [
+      "pygeoapi/plugin.py",
+      "pygeoapi/pubsub/http.py",
+      "pygeoapi/pubsub/kafka.py",
+      "pygeoapi/pubsub/mqtt.py"
+    ],
+    "docs_files_touched": [
+      "docs/source/pubsub.rst"
+    ],
+    "ground_truth_docs_affected": true
+  },
+  {
+    "number": 2251,
+    "title": "Support SQL connection string",
+    "mergedAt": "2026-02-24T11:01:31Z",
+    "url": "https://github.com/geopython/pygeoapi/pull/2251",
+    "src_files": [
+      "pygeoapi/process/manager/postgresql.py",
+      "pygeoapi/provider/sql.py"
+    ],
+    "docs_files_touched": [
+      "docs/source/publishing/ogcapi-features.rst"
+    ],
+    "ground_truth_docs_affected": true
+  },
+  {
+    "number": 2220,
+    "title": "add support for OGC API Publish-Subscribe Workflow - Part 1: Core (#2146)",
+    "mergedAt": "2026-01-29T16:10:21Z",
+    "url": "https://github.com/geopython/pygeoapi/pull/2220",
+    "src_files": [
+      "pygeoapi/__init__.py",
+      "pygeoapi/api/__init__.py",
+      "pygeoapi/api/itemtypes.py",
+      "pygeoapi/api/processes.py",
+      "pygeoapi/api/pubsub.py",
+      "pygeoapi/asyncapi.py",
+      "pygeoapi/django_/urls.py",
+      "pygeoapi/django_/views.py",
+      "pygeoapi/flask_app.py",
+      "pygeoapi/openapi.py",
+      "pygeoapi/plugin.py",
+      "pygeoapi/provider/base.py",
+      "pygeoapi/pubsub/__init__.py",
+      "pygeoapi/pubsub/base.py",
+      "pygeoapi/pubsub/http.py",
+      "pygeoapi/pubsub/mqtt.py",
+      "pygeoapi/starlette_app.py",
+      "pygeoapi/util.py"
+    ],
+    "docs_files_touched": [
+      "docs/source/administration.rst",
+      "docs/source/configuration.rst",
+      "docs/source/index.rst",
+      "docs/source/pubsub.rst"
+    ],
+    "ground_truth_docs_affected": true
+  },
+  {
+    "number": 2215,
+    "title": "Implement optional count in Feature Providers",
+    "mergedAt": "2026-05-11T01:57:26Z",
+    "url": "https://github.com/geopython/pygeoapi/pull/2215",
+    "src_files": [
+      "pygeoapi/provider/csv_.py",
+      "pygeoapi/provider/esri.py",
+      "pygeoapi/provider/geojson.py",
+      "pygeoapi/provider/mongo.py",
+      "pygeoapi/provider/socrata.py",
+      "pygeoapi/provider/sql.py",
+      "pygeoapi/provider/sqlite.py",
+      "pygeoapi/provider/tinydb_.py"
+    ],
+    "docs_files_touched": [
+      "docs/source/configuration.rst",
+      "docs/source/publishing/ogcapi-features.rst"
+    ],
+    "ground_truth_docs_affected": true
+  },
+  {
+    "number": 2214,
+    "title": "update EDR and Maps to support MetOcean access and visualization workflows (#2213)",
+    "mergedAt": "2026-01-20T23:21:46Z",
+    "url": "https://github.com/geopython/pygeoapi/pull/2214",
+    "src_files": [
+      "pygeoapi/api/__init__.py",
+      "pygeoapi/api/coverages.py",
+      "pygeoapi/api/environmental_data_retrieval.py",
+      "pygeoapi/api/itemtypes.py",
+      "pygeoapi/api/maps.py",
+      "pygeoapi/openapi.py",
+      "pygeoapi/provider/base_edr.py",
+      "pygeoapi/provider/wms_facade.py",
+      "pygeoapi/provider/xarray_.py"
+    ],
+    "docs_files_touched": [
+      "docs/source/configuration.rst",
+      "docs/source/plugins.rst",
+      "docs/source/publishing/ogcapi-coverages.rst",
+      "docs/source/publishing/ogcapi-edr.rst",
+      "docs/source/publishing/ogcapi-maps.rst"
+    ],
+    "ground_truth_docs_affected": true
+  },
+  {
+    "number": 2174,
+    "title": "fix: add fix for slow full count in postgresql",
+    "mergedAt": "2026-02-03T11:18:06Z",
+    "url": "https://github.com/geopython/pygeoapi/pull/2174",
+    "src_files": [
+      "pygeoapi/provider/base.py",
+      "pygeoapi/provider/sql.py"
+    ],
+    "docs_files_touched": [
+      "docs/source/publishing/ogcapi-features.rst"
+    ],
+    "ground_truth_docs_affected": true
+  },
+  {
+    "number": 2170,
+    "title": "Add CRS parameter support to EDR API",
+    "mergedAt": "2026-01-09T01:54:52Z",
+    "url": "https://github.com/geopython/pygeoapi/pull/2170",
+    "src_files": [
+      "pygeoapi/api/environmental_data_retrieval.py"
+    ],
+    "docs_files_touched": [
+      "docs/source/crs.rst"
+    ],
+    "ground_truth_docs_affected": true
+  },
+  {
+    "number": 2167,
+    "title": "Fix WMTSFacade provider",
+    "mergedAt": "2025-12-09T19:35:01Z",
+    "url": "https://github.com/geopython/pygeoapi/pull/2167",
+    "src_files": [
+      "pygeoapi/provider/wmts_facade.py"
+    ],
+    "docs_files_touched": [
+      "docs/source/publishing/ogcapi-tiles.rst"
+    ],
+    "ground_truth_docs_affected": true
+  },
+  {
+    "number": 2144,
+    "title": "fix support for custom formatters (#1997)",
+    "mergedAt": "2026-01-11T10:26:35Z",
+    "url": "https://github.com/geopython/pygeoapi/pull/2144",
+    "src_files": [
+      "pygeoapi/__init__.py",
+      "pygeoapi/api/__init__.py",
+      "pygeoapi/api/environmental_data_retrieval.py",
+      "pygeoapi/api/itemtypes.py",
+      "pygeoapi/formatter/base.py",
+      "pygeoapi/formatter/csv_.py",
+      "pygeoapi/provider/csw_facade.py",
+      "pygeoapi/util.py"
+    ],
+    "docs_files_touched": [
+      "docs/source/configuration.rst",
+      "docs/source/plugins.rst"
+    ],
+    "ground_truth_docs_affected": true
+  },
+  {
+    "number": 2131,
+    "title": "update MapScript map provider output formats",
+    "mergedAt": "2025-10-18T12:19:10Z",
+    "url": "https://github.com/geopython/pygeoapi/pull/2131",
+    "src_files": [
+      "pygeoapi/provider/mapscript_.py"
+    ],
+    "docs_files_touched": [
+      "docs/source/publishing/stac.rst"
+    ],
+    "ground_truth_docs_affected": true
+  },
+  {
+    "number": 2129,
+    "title": "add support for STAC API v1.0.0",
+    "mergedAt": "2025-10-18T09:50:49Z",
+    "url": "https://github.com/geopython/pygeoapi/pull/2129",
+    "src_files": [
+      "pygeoapi/api/__init__.py",
+      "pygeoapi/api/stac.py",
+      "pygeoapi/django_/urls.py",
+      "pygeoapi/django_/views.py",
+      "pygeoapi/flask_app.py",
+      "pygeoapi/provider/xarray_.py",
+      "pygeoapi/starlette_app.py"
+    ],
+    "docs_files_touched": [
+      "docs/source/publishing/stac.rst"
+    ],
+    "ground_truth_docs_affected": true
+  },
+  {
+    "number": 2116,
+    "title": "Normalize CRS handling",
+    "mergedAt": "2025-10-27T00:00:50Z",
+    "url": "https://github.com/geopython/pygeoapi/pull/2116",
+    "src_files": [
+      "pygeoapi/api/__init__.py",
+      "pygeoapi/api/itemtypes.py",
+      "pygeoapi/api/maps.py",
+      "pygeoapi/crs.py",
+      "pygeoapi/provider/base.py",
+      "pygeoapi/provider/csv_.py",
+      "pygeoapi/provider/csw_facade.py",
+      "pygeoapi/provider/elasticsearch_.py",
+      "pygeoapi/provider/erddap.py",
+      "pygeoapi/provider/esri.py",
+      "pygeoapi/provider/geojson.py",
+      "pygeoapi/provider/mongo.py",
+      "pygeoapi/provider/mvt_postgresql.py",
+      "pygeoapi/provider/ogr.py",
+      "pygeoapi/provider/opensearch_.py",
+      "pygeoapi/provider/oracle.py",
+      "pygeoapi/provider/parquet.py",
+      "pygeoapi/provider/sensorthings.py",
+      "pygeoapi/provider/socrata.py",
+      "pygeoapi/provider/sql.py",
+      "pygeoapi/provider/sqlite.py",
+      "pygeoapi/provider/tinydb_.py",
+      "pygeoapi/provider/xarray_.py",
+      "pygeoapi/util.py"
+    ],
+    "docs_files_touched": [
+      "docs/source/configuration.rst",
+      "docs/source/crs.rst",
+      "docs/source/plugins.rst",
+      "docs/source/publishing/ogcapi-coverages.rst",
+      "docs/source/publishing/ogcapi-edr.rst",
+      "docs/source/publishing/ogcapi-features.rst"
+    ],
+    "ground_truth_docs_affected": true
+  },
+  {
+    "number": 2092,
+    "title": "enable custom tile matrix sets (#2074)",
+    "mergedAt": "2025-08-19T01:41:38Z",
+    "url": "https://github.com/geopython/pygeoapi/pull/2092",
+    "src_files": [
+      "pygeoapi/provider/base_mvt.py",
+      "pygeoapi/provider/mvt_elastic.py",
+      "pygeoapi/provider/mvt_postgresql.py",
+      "pygeoapi/provider/mvt_tippecanoe.py",
+      "pygeoapi/provider/tile.py"
+    ],
+    "docs_files_touched": [
+      "docs/source/data-publishing/ogcapi-tiles.rst"
+    ],
+    "ground_truth_docs_affected": true
+  },
+  {
+    "number": 2091,
+    "title": "housekeeping (tests, docs)",
+    "mergedAt": "2025-08-18T01:56:18Z",
+    "url": "https://github.com/geopython/pygeoapi/pull/2091",
+    "src_files": [
+      "pygeoapi/api/__init__.py",
+      "pygeoapi/config.py",
+      "pygeoapi/models/provider/base.py",
+      "pygeoapi/openapi.py",
+      "pygeoapi/util.py"
+    ],
+    "docs_files_touched": [
+      "docs/source/data-publishing/ogcapi-features.rst",
+      "docs/source/data-publishing/ogcapi-tiles.rst",
+      "docs/source/development.rst",
+      "docs/source/index.rst",
+      "docs/source/ogc-compliance.rst"
+    ],
+    "ground_truth_docs_affected": true
+  },
+  {
+    "number": 2083,
+    "title": "Ensure tile is within configured zoom",
+    "mergedAt": "2025-08-14T14:45:30Z",
+    "url": "https://github.com/geopython/pygeoapi/pull/2083",
+    "src_files": [
+      "pygeoapi/provider/tile.py"
+    ],
+    "docs_files_touched": [],
+    "ground_truth_docs_affected": false
+  },
+  {
+    "number": 2341,
+    "title": "Use declarative SQLalchemy Job Table",
+    "mergedAt": "2026-05-12T01:10:13Z",
+    "url": "https://github.com/geopython/pygeoapi/pull/2341",
+    "src_files": [
+      "pygeoapi/process/manager/postgresql.py"
+    ],
+    "docs_files_touched": [],
+    "ground_truth_docs_affected": false
+  },
+  {
+    "number": 2390,
+    "title": "EDR: add instance link title",
+    "mergedAt": "2026-07-13T12:17:49Z",
+    "url": "https://github.com/geopython/pygeoapi/pull/2390",
+    "src_files": [
+      "pygeoapi/api/environmental_data_retrieval.py"
+    ],
+    "docs_files_touched": [],
+    "ground_truth_docs_affected": false
+  },
+  {
+    "number": 2283,
+    "title": "OAProc: safeguard link rel check (#2282)",
+    "mergedAt": "2026-03-10T01:42:41Z",
+    "url": "https://github.com/geopython/pygeoapi/pull/2283",
+    "src_files": [
+      "pygeoapi/api/processes.py"
+    ],
+    "docs_files_touched": [],
+    "ground_truth_docs_affected": false
+  },
+  {
+    "number": 2292,
+    "title": "emit jobs endpoints only when manager supports async (#2291)",
+    "mergedAt": "2026-03-20T10:46:46Z",
+    "url": "https://github.com/geopython/pygeoapi/pull/2292",
+    "src_files": [
+      "pygeoapi/api/__init__.py",
+      "pygeoapi/api/processes.py"
+    ],
+    "docs_files_touched": [],
+    "ground_truth_docs_affected": false
+  },
+  {
+    "number": 2303,
+    "title": "WMS Facade updates",
+    "mergedAt": "2026-03-27T16:29:20Z",
+    "url": "https://github.com/geopython/pygeoapi/pull/2303",
+    "src_files": [
+      "pygeoapi/api/maps.py",
+      "pygeoapi/provider/wms_facade.py"
+    ],
+    "docs_files_touched": [],
+    "ground_truth_docs_affected": false
+  },
+  {
+    "number": 2338,
+    "title": "fix job start / duration rendering (#2328)",
+    "mergedAt": "2026-05-11T15:05:32Z",
+    "url": "https://github.com/geopython/pygeoapi/pull/2338",
+    "src_files": [
+      "pygeoapi/util.py"
+    ],
+    "docs_files_touched": [],
+    "ground_truth_docs_affected": false
+  },
+  {
+    "number": 2346,
+    "title": "add translation support for data elements",
+    "mergedAt": "2026-05-22T11:24:25Z",
+    "url": "https://github.com/geopython/pygeoapi/pull/2346",
+    "src_files": [
+      "pygeoapi/l10n.py"
+    ],
+    "docs_files_touched": [],
+    "ground_truth_docs_affected": false
+  },
+  {
+    "number": 2119,
+    "title": "add csrf_exempt in view.py (Django)",
+    "mergedAt": "2025-10-01T09:15:38Z",
+    "url": "https://github.com/geopython/pygeoapi/pull/2119",
+    "src_files": [
+      "pygeoapi/django_/views.py"
+    ],
+    "docs_files_touched": [],
+    "ground_truth_docs_affected": false
+  },
+  {
+    "number": 2357,
+    "title": "EDR: emit data link JSON media type as CoverageJSON",
+    "mergedAt": "2026-06-06T12:22:49Z",
+    "url": "https://github.com/geopython/pygeoapi/pull/2357",
+    "src_files": [
+      "pygeoapi/api/collection.py",
+      "pygeoapi/api/environmental_data_retrieval.py"
+    ],
+    "docs_files_touched": [],
+    "ground_truth_docs_affected": false
+  },
+  {
+    "number": 2200,
+    "title": "ES: fix property evaluation (#2189)",
+    "mergedAt": "2026-01-11T13:30:57Z",
+    "url": "https://github.com/geopython/pygeoapi/pull/2200",
+    "src_files": [
+      "pygeoapi/provider/elasticsearch_.py"
+    ],
+    "docs_files_touched": [],
+    "ground_truth_docs_affected": false
+  },
+  {
+    "number": 2389,
+    "title": "EDR: fix multilingual instance metadata and links",
+    "mergedAt": "2026-07-13T09:45:45Z",
+    "url": "https://github.com/geopython/pygeoapi/pull/2389",
+    "src_files": [
+      "pygeoapi/api/environmental_data_retrieval.py"
+    ],
+    "docs_files_touched": [],
+    "ground_truth_docs_affected": false
+  },
+  {
+    "number": 2085,
+    "title": "maintain order of PostgreSQL table columns (#2078)",
+    "mergedAt": "2025-08-15T19:56:27Z",
+    "url": "https://github.com/geopython/pygeoapi/pull/2085",
+    "src_files": [
+      "pygeoapi/provider/sql.py"
+    ],
+    "docs_files_touched": [],
+    "ground_truth_docs_affected": false
+  },
+  {
+    "number": 2101,
+    "title": "Raise ProviderTileNotFoundError instead of returning",
+    "mergedAt": "2025-09-11T08:20:14Z",
+    "url": "https://github.com/geopython/pygeoapi/pull/2101",
+    "src_files": [
+      "pygeoapi/provider/mvt_postgresql.py"
+    ],
+    "docs_files_touched": [],
+    "ground_truth_docs_affected": false
+  },
+  {
+    "number": 2306,
+    "title": "- fixed bug introduced in previous commit",
+    "mergedAt": "2026-03-28T00:13:19Z",
+    "url": "https://github.com/geopython/pygeoapi/pull/2306",
+    "src_files": [
+      "pygeoapi/provider/wms_facade.py"
+    ],
+    "docs_files_touched": [],
+    "ground_truth_docs_affected": false
+  },
+  {
+    "number": 2296,
+    "title": "update TinyDB query builder",
+    "mergedAt": "2026-03-25T11:18:38Z",
+    "url": "https://github.com/geopython/pygeoapi/pull/2296",
+    "src_files": [
+      "pygeoapi/provider/tinydb_.py"
+    ],
+    "docs_files_touched": [],
+    "ground_truth_docs_affected": false
+  },
+  {
+    "number": 2143,
+    "title": "Fix missing types to core pygeoapi",
+    "mergedAt": "2025-10-25T14:50:57Z",
+    "url": "https://github.com/geopython/pygeoapi/pull/2143",
+    "src_files": [
+      "pygeoapi/api/__init__.py",
+      "pygeoapi/api/admin.py",
+      "pygeoapi/api/coverages.py",
+      "pygeoapi/api/environmental_data_retrieval.py",
+      "pygeoapi/api/itemtypes.py",
+      "pygeoapi/api/maps.py",
+      "pygeoapi/api/processes.py",
+      "pygeoapi/api/stac.py",
+      "pygeoapi/api/tiles.py",
+      "pygeoapi/flask_app.py",
+      "pygeoapi/formatter/base.py",
+      "pygeoapi/l10n.py",
+      "pygeoapi/linked_data.py",
+      "pygeoapi/log.py",
+      "pygeoapi/starlette_app.py"
+    ],
+    "docs_files_touched": [],
+    "ground_truth_docs_affected": false
+  },
+  {
+    "number": 2118,
+    "title": "Catch EDR `AttributeError` errors more fine grained",
+    "mergedAt": "2025-10-21T14:56:01Z",
+    "url": "https://github.com/geopython/pygeoapi/pull/2118",
+    "src_files": [
+      "pygeoapi/provider/base_edr.py"
+    ],
+    "docs_files_touched": [],
+    "ground_truth_docs_affected": false
+  },
+  {
+    "number": 2312,
+    "title": "OAProc: fix binary outputs and non-JSON output (#2304) (#2311)",
+    "mergedAt": "2026-04-09T08:16:28Z",
+    "url": "https://github.com/geopython/pygeoapi/pull/2312",
+    "src_files": [
+      "pygeoapi/api/itemtypes.py",
+      "pygeoapi/api/processes.py",
+      "pygeoapi/process/hello_world.py",
+      "pygeoapi/process/manager/base.py"
+    ],
+    "docs_files_touched": [],
+    "ground_truth_docs_affected": false
+  },
+  {
+    "number": 2201,
+    "title": "set f= in next/prev links (#2175)",
+    "mergedAt": "2026-01-11T16:53:30Z",
+    "url": "https://github.com/geopython/pygeoapi/pull/2201",
+    "src_files": [
+      "pygeoapi/api/itemtypes.py"
+    ],
+    "docs_files_touched": [],
+    "ground_truth_docs_affected": false
+  },
+  {
+    "number": 2082,
+    "title": "Align GetTile responses of the WMTS provider with the other tile providers",
+    "mergedAt": "2025-08-13T21:28:02Z",
+    "url": "https://github.com/geopython/pygeoapi/pull/2082",
+    "src_files": [
+      "pygeoapi/provider/base_mvt.py",
+      "pygeoapi/provider/tile.py",
+      "pygeoapi/provider/wmts_facade.py"
+    ],
+    "docs_files_touched": [],
+    "ground_truth_docs_affected": false
+  },
+  {
+    "number": 2090,
+    "title": "Add support for CORS with Django",
+    "mergedAt": "2025-09-14T12:27:27Z",
+    "url": "https://github.com/geopython/pygeoapi/pull/2090",
+    "src_files": [
+      "pygeoapi/django_/settings.py"
+    ],
+    "docs_files_touched": [],
+    "ground_truth_docs_affected": false
+  },
+  {
+    "number": 2271,
+    "title": "Geoparquet 1.1 spec compliance update",
+    "mergedAt": "2026-03-09T12:50:36Z",
+    "url": "https://github.com/geopython/pygeoapi/pull/2271",
+    "src_files": [
+      "pygeoapi/provider/parquet.py"
+    ],
+    "docs_files_touched": [],
+    "ground_truth_docs_affected": false
+  },
+  {
+    "number": 2094,
+    "title": "Make sure 204 status responses have no body in accordance with HTTP spec",
+    "mergedAt": "2025-09-15T13:41:05Z",
+    "url": "https://github.com/geopython/pygeoapi/pull/2094",
+    "src_files": [
+      "pygeoapi/api/__init__.py",
+      "pygeoapi/starlette_app.py"
+    ],
+    "docs_files_touched": [],
+    "ground_truth_docs_affected": false
+  }
+]

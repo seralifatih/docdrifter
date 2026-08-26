@@ -1,0 +1,310 @@
+[
+  {
+    "number": 761,
+    "title": "Support response headers in @app.doc(responses={...})",
+    "predicted": true,
+    "actual": true,
+    "reason": "This PR adds a new user-facing feature (supporting response headers in @app.doc(responses={...})) that changes the public API behavior and should be documented in the prose docs/*.md files, even though the docstring was updated."
+  },
+  {
+    "number": 760,
+    "title": "Register nested Pydantic schemas used in parameter locations",
+    "predicted": false,
+    "actual": false,
+    "reason": "This is an internal bug fix that registers nested Pydantic schemas in the OpenAPI spec generation, with no change to public API behavior, signatures, defaults, or documented configuration options."
+  },
+  {
+    "number": 759,
+    "title": "fix: replace default response with factory method",
+    "predicted": false,
+    "actual": false,
+    "reason": "This is an internal refactor that replaces a module-level constant with a factory function returning an identical dict, with no change to public API behavior, defaults, or documented values."
+  },
+  {
+    "number": 756,
+    "title": "fix: recognize list[UploadFile] as a multiple file field",
+    "predicted": false,
+    "actual": false,
+    "reason": "This is an internal helper function change that fixes type comparison for list[UploadFile] recognition, but it doesn't alter any public API, documented defaults, or user-facing behavior that would require documentation updates."
+  },
+  {
+    "number": 751,
+    "title": "Normalize header names in OpenAPI",
+    "predicted": true,
+    "actual": true,
+    "reason": "This PR changes how header names are normalized (underscores converted to hyphens) in generated OpenAPI parameters, which is observable behavior for users defining header fields, and the docs likely describe header name handling."
+  },
+  {
+    "number": 749,
+    "title": "feat(exceptions): add __str__ method to HTTPError",
+    "predicted": false,
+    "actual": false,
+    "reason": "Adding __str__ and __repr__ methods to HTTPError is an internal implementation detail that doesn't change any public API behavior, signature, or documented defaults."
+  },
+  {
+    "number": 744,
+    "title": "Support flask-httpauth 4.8.1+",
+    "predicted": false,
+    "actual": false,
+    "reason": "This is an internal compatibility fix for a dependency version change that doesn't alter any public API behavior, signatures, or documented defaults."
+  },
+  {
+    "number": 736,
+    "title": "Fix type checking for view function return types",
+    "predicted": false,
+    "actual": false,
+    "reason": "This PR only adds type-checking annotations and imports for static typing, with no change to runtime behavior, public API signatures, or documented defaults visible to users."
+  },
+  {
+    "number": 725,
+    "title": "Fix `@app.output(Schema(many=True))` is not `array` type in OpenAPI doc",
+    "predicted": false,
+    "actual": false,
+    "reason": "This is an internal fix to schema adapter detection that makes the code correctly apply the already-documented `many=True` behavior for marshmallow schemas, without changing any documented public API or default value."
+  },
+  {
+    "number": 715,
+    "title": "Support upload file model",
+    "predicted": true,
+    "actual": true,
+    "reason": "This PR adds a new public API feature for uploading files with Pydantic models, including new validators and an UploadFile type, which requires documentation updates."
+  },
+  {
+    "number": 713,
+    "title": "Support pagination with Pydantic",
+    "predicted": true,
+    "actual": true,
+    "reason": "This PR adds a new public API (PaginationModel) and a new schema_type parameter to pagination_builder, which are user-facing features that should be documented in the docs/*.md files."
+  },
+  {
+    "number": 712,
+    "title": "Release 3.0.2",
+    "predicted": true,
+    "actual": false,
+    "reason": "The PR changes the documented public API description for input and output schemas to include Pydantic models, which is a user-facing behavior change that should be reflected in the docs."
+  },
+  {
+    "number": 710,
+    "title": "Fix @input and @output SchemaType error for Pydantic",
+    "predicted": false,
+    "actual": false,
+    "reason": "This is a type-annotation-only change that adds Pydantic BaseModel to a type alias, with no runtime behavior change visible to API users."
+  },
+  {
+    "number": 708,
+    "title": "Fix response model Field alias",
+    "predicted": true,
+    "actual": true,
+    "reason": "This PR changes how response models are serialized (now using field aliases), which is observable behavior for users defining Pydantic models with aliases, and the docs should describe this behavior."
+  },
+  {
+    "number": 695,
+    "title": "Fix DelimitedList support",
+    "predicted": false,
+    "actual": false,
+    "reason": "This is an internal fix to OpenAPI spec generation for DelimitedList fields, which does not change any documented public API behavior, defaults, or user-facing configuration."
+  },
+  {
+    "number": 694,
+    "title": "Deprecate EmptySchema",
+    "predicted": true,
+    "actual": true,
+    "reason": "The PR deprecates the public EmptySchema class, changing its documented usage and removing the __version__ attribute, both of which are user-facing API changes that require updates to the docs/*.md files."
+  },
+  {
+    "number": 693,
+    "title": "Update the default schema name resolver",
+    "predicted": true,
+    "actual": true,
+    "reason": "The PR changes the default schema name resolver behavior by removing the 'Schema' suffix stripping, which affects the documented default naming convention for OpenAPI schemas that users see in their generated API docs."
+  },
+  {
+    "number": 691,
+    "title": "Add Pydantic support",
+    "predicted": true,
+    "actual": true,
+    "reason": "This PR adds a new public feature (Pydantic support) with new schema adapter, list[Model] syntax handling, and changes to validation error behavior, which requires documentation updates for users."
+  },
+  {
+    "number": 690,
+    "title": "Decouple from marshmallow",
+    "predicted": true,
+    "actual": false,
+    "reason": "This PR introduces a new schema adapter system with public API changes (new SchemaAdapter, SchemaRegistry, registry classes, and changes to schema name resolution behavior) that should be documented for users."
+  },
+  {
+    "number": 689,
+    "title": "Support Python3.14",
+    "predicted": false,
+    "actual": false,
+    "reason": "This is a type-checking comment addition for Python 3.14 compatibility with no user-visible behavior change."
+  },
+  {
+    "number": 678,
+    "title": "Add return type information from APIFlask route method helpers",
+    "predicted": false,
+    "actual": false,
+    "reason": "This PR only adds type annotations to existing public methods without changing any behavior, signatures, defaults, or user-visible functionality."
+  },
+  {
+    "number": 665,
+    "title": "feat(#604): MultiAuth - Support for a runtime choice of Authentication methods",
+    "predicted": true,
+    "actual": true,
+    "reason": "This PR adds a new public MultiAuth class, new APIKey auth classes, and changes the auth class constructors with a new `name` parameter and `get_security_scheme` method, all of which are user-facing API changes that should be documented in the docs/*.md files."
+  },
+  {
+    "number": 659,
+    "title": "fix(#618): `MethodView` with subclass",
+    "predicted": false,
+    "actual": false,
+    "reason": "This is an internal fix to how view class methods are accessed (using getattr instead of __dict__), which doesn't change any public API behavior, signature, or documented defaults."
+  },
+  {
+    "number": 650,
+    "title": "Replace UNPKG w/ jsDelivr",
+    "predicted": true,
+    "actual": true,
+    "reason": "The PR changes the default CDN URLs for Swagger UI, Elements, Rapidoc, and Rapipdf assets, which are documented default values in the docs and affect what users see when loading the API documentation."
+  },
+  {
+    "number": 642,
+    "title": "Add parameter 'docs_oauth2_redirect_path_external' to support absolute redirect url.",
+    "predicted": true,
+    "actual": false,
+    "reason": "This PR adds a new public configuration parameter 'docs_oauth2_redirect_path_external' that changes how the OAuth2 redirect URL is generated, which is a user-facing feature that should be documented in the docs."
+  },
+  {
+    "number": 632,
+    "title": "Modify response headers to be compliant with OAS 3.0.0+",
+    "predicted": false,
+    "actual": false,
+    "reason": "This is an internal fix to make generated OpenAPI response headers compliant with OAS 3.0.0+ by removing 'in' and 'name' keys from header objects, which does not change any documented public API behavior, defaults, or user-facing configuration."
+  },
+  {
+    "number": 630,
+    "title": "Modify input validation skip to use webargs implementation",
+    "predicted": true,
+    "actual": false,
+    "reason": "The PR removes the public `_load_raw_data` function and replaces it with a new `load_location_data` method on the parser, changing the documented API surface for loading raw request data."
+  },
+  {
+    "number": 627,
+    "title": "Include input documentation in API spec when skipping validation",
+    "predicted": true,
+    "actual": false,
+    "reason": "This PR changes the behavior of the input decorator when validation is skipped, now including input documentation in the API spec, which is a user-visible change to how the public API behaves."
+  },
+  {
+    "number": 615,
+    "title": "Add flag to allow disabling of validation on input(issue 573)",
+    "predicted": true,
+    "actual": true,
+    "reason": "The PR adds a new public `validation` parameter to the `input` decorator, which is a user-facing feature that should be documented in the docs."
+  },
+  {
+    "number": 605,
+    "title": "Fix OpenAPI spec for multiple content types (json_for_form)",
+    "predicted": true,
+    "actual": true,
+    "reason": "The PR adds support for multiple content types in the OpenAPI spec for json_or_form input, which is a new user-facing feature that changes how request bodies are documented and should be reflected in the docs."
+  },
+  {
+    "number": 599,
+    "title": "Release 2.2.0",
+    "predicted": false,
+    "actual": false,
+    "reason": "This is an internal type-checking comment addition with no behavior change visible to API users."
+  },
+  {
+    "number": 590,
+    "title": "Replace flake8 with Ruff",
+    "predicted": false,
+    "actual": false,
+    "reason": "This PR is purely a linting/formatting change (replacing flake8 with Ruff) that only reformats code and adds trailing commas, with no changes to public API behavior, signatures, defaults, or user-facing features."
+  },
+  {
+    "number": 589,
+    "title": "Support adding custom field to operation object (view function) #571",
+    "predicted": true,
+    "actual": true,
+    "reason": "The PR adds a new public `extensions` parameter to the `doc` decorator, which is a user-facing feature that should be documented in the docs/*.md files."
+  },
+  {
+    "number": 585,
+    "title": "Use postponed evaluation of annotations",
+    "predicted": false,
+    "actual": false,
+    "reason": "This PR is a pure type-annotation modernization (switching to postponed evaluation with `from __future__ import annotations` and using PEP 604 union syntax), with no change to any public API behavior, signatures, defaults, or user-visible functionality."
+  },
+  {
+    "number": 578,
+    "title": "Skip data serialization for FileSchema output",
+    "predicted": false,
+    "actual": false,
+    "reason": "This is an internal implementation detail in the scaffold's jsonify helper that changes how FileSchema output is handled at runtime, but it does not alter any public API signature, documented default, or user-facing behavior that would require documentation updates."
+  },
+  {
+    "number": 560,
+    "title": "Switch to pyproject.toml",
+    "predicted": true,
+    "actual": false,
+    "reason": "The PR deprecates the public `__version__` attribute, which is a user-facing API change that should be documented in the docs."
+  },
+  {
+    "number": 550,
+    "title": "Add support for a --quiet flag to the flask spec command",
+    "predicted": true,
+    "actual": true,
+    "reason": "The PR adds a new user-facing --quiet flag to the public `flask spec` command, which is a documented CLI feature that should be reflected in the docs."
+  },
+  {
+    "number": 549,
+    "title": "Fix spec command for complex data types",
+    "predicted": false,
+    "actual": false,
+    "reason": "The PR only changes the import source of the json module from the standard library to Flask's bundled json, with no observable behavior change to public API users."
+  },
+  {
+    "number": 543,
+    "title": "Reuse the File, Config field, and file-related validators from flask-marshmallow",
+    "predicted": true,
+    "actual": true,
+    "reason": "The PR removes the public File field, Config field, and file-related validators (FileSize, FileType) from apiflask's own modules and replaces them with re-exports from flask-marshmallow, which changes the documented public API surface and requires docs updates to reflect the new source of these components."
+  },
+  {
+    "number": 539,
+    "title": "Ignore module import type error",
+    "predicted": false,
+    "actual": false,
+    "reason": "This is an internal type-checking fix with no behavior change visible to API users."
+  },
+  {
+    "number": 536,
+    "title": "perf: optimize `get_filestorage_size`",
+    "predicted": false,
+    "actual": false,
+    "reason": "This is an internal performance optimization of a helper function's implementation with no change to its public API behavior or documented values."
+  },
+  {
+    "number": 533,
+    "title": "fix: correct the return type of abort()",
+    "predicted": false,
+    "actual": false,
+    "reason": "This is a type-annotation-only change to a private helper function's return type with no observable behavior change for API users."
+  },
+  {
+    "number": 531,
+    "title": "Remove override of set_class in Schema",
+    "predicted": true,
+    "actual": false,
+    "reason": "The PR removes the documented behavior that APIFlask's Schema uses OrderedSet by default, changing the public API's behavior and the class docstring, so docs describing this difference must be updated."
+  },
+  {
+    "number": 530,
+    "title": "Update pyupgrade; use --py38-plus",
+    "predicted": false,
+    "actual": false,
+    "reason": "This is an internal code modernization/refactor (removing Python 3.7 compatibility shims) with no change to public API behavior or documented values."
+  }
+]

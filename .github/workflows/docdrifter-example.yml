@@ -1,0 +1,21 @@
+name: DocDrifter
+
+on:
+  pull_request:
+    types: [opened, synchronize, reopened]
+
+permissions:
+  pull-requests: write
+  contents: read
+
+jobs:
+  check-docs:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: docdrifter/action@v1  # placeholder until published
+        with:
+          deepseek-api-key: ${{ secrets.DEEPSEEK_API_KEY }}
+          src-path: "src/"
+          docs-path: "docs/"
+          repo-description: "describe your project here"

@@ -1,0 +1,34 @@
+{
+  "760": [
+    "LLM hatasi",
+    "internal helper fonksiyon, kullanici kodu degismiyor"
+  ],
+  "712": [
+    "LLM hatasi",
+    "docstring zaten guncellendi, docs/*.md gerekmiyor"
+  ],
+  "690": [
+    "Belirsiz/gercek drift",
+    "buyuk internal refactor ama yeni public siniflar da var"
+  ],
+  "642": [
+    "Gercek drift",
+    "yeni public config parametresi eklendi, repo docs borcu"
+  ],
+  "630": [
+    "Belirsiz",
+    "internal implementation degisikligi, public davranis ayni olabilir"
+  ],
+  "627": [
+    "LLM hatasi",
+    "OpenAPI spec ciktisini etkiliyor, statik docs/*.md degil"
+  ],
+  "560": [
+    "Gercek drift (kucuk)",
+    "__version__ deprecate edildi, gercek ama dusuk etkili"
+  ],
+  "531": [
+    "Sinirda/gercek drift",
+    "docstring degisti ama docs/*.md muhtemelen bu detayi hic icermiyordu"
+  ]
+}

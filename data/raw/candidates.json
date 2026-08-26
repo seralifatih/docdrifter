@@ -1,0 +1,584 @@
+[
+  {
+    "number": 761,
+    "title": "Support response headers in @app.doc(responses={...})",
+    "mergedAt": "2026-08-15T14:36:39Z",
+    "url": "https://github.com/apiflask/apiflask/pull/761",
+    "src_files": [
+      "src/apiflask/app.py",
+      "src/apiflask/scaffold.py"
+    ],
+    "docs_files_touched": [
+      "docs/openapi.md"
+    ],
+    "ground_truth_docs_affected": true
+  },
+  {
+    "number": 760,
+    "title": "Register nested Pydantic schemas used in parameter locations",
+    "mergedAt": "2026-08-10T06:01:27Z",
+    "url": "https://github.com/apiflask/apiflask/pull/760",
+    "src_files": [
+      "src/apiflask/app.py",
+      "src/apiflask/openapi_adapters.py"
+    ],
+    "docs_files_touched": [],
+    "ground_truth_docs_affected": false
+  },
+  {
+    "number": 759,
+    "title": "fix: replace default response with factory method",
+    "mergedAt": "2026-08-02T05:13:30Z",
+    "url": "https://github.com/apiflask/apiflask/pull/759",
+    "src_files": [
+      "src/apiflask/app.py",
+      "src/apiflask/openapi.py"
+    ],
+    "docs_files_touched": [],
+    "ground_truth_docs_affected": false
+  },
+  {
+    "number": 756,
+    "title": "fix: recognize list[UploadFile] as a multiple file field",
+    "mergedAt": "2026-07-27T01:51:38Z",
+    "url": "https://github.com/apiflask/apiflask/pull/756",
+    "src_files": [
+      "src/apiflask/helpers.py"
+    ],
+    "docs_files_touched": [],
+    "ground_truth_docs_affected": false
+  },
+  {
+    "number": 751,
+    "title": "Normalize header names in OpenAPI",
+    "mergedAt": "2026-06-17T15:55:16Z",
+    "url": "https://github.com/apiflask/apiflask/pull/751",
+    "src_files": [
+      "src/apiflask/helpers.py",
+      "src/apiflask/openapi_adapters.py"
+    ],
+    "docs_files_touched": [
+      "docs/request.md"
+    ],
+    "ground_truth_docs_affected": true
+  },
+  {
+    "number": 749,
+    "title": "feat(exceptions): add __str__ method to HTTPError",
+    "mergedAt": "2026-06-17T02:12:52Z",
+    "url": "https://github.com/apiflask/apiflask/pull/749",
+    "src_files": [
+      "src/apiflask/exceptions.py"
+    ],
+    "docs_files_touched": [],
+    "ground_truth_docs_affected": false
+  },
+  {
+    "number": 744,
+    "title": "Support flask-httpauth 4.8.1+",
+    "mergedAt": "2026-04-14T13:44:01Z",
+    "url": "https://github.com/apiflask/apiflask/pull/744",
+    "src_files": [
+      "src/apiflask/security.py"
+    ],
+    "docs_files_touched": [],
+    "ground_truth_docs_affected": false
+  },
+  {
+    "number": 736,
+    "title": "Fix type checking for view function return types",
+    "mergedAt": "2026-03-21T11:06:43Z",
+    "url": "https://github.com/apiflask/apiflask/pull/736",
+    "src_files": [
+      "src/apiflask/scaffold.py"
+    ],
+    "docs_files_touched": [],
+    "ground_truth_docs_affected": false
+  },
+  {
+    "number": 725,
+    "title": "Fix `@app.output(Schema(many=True))` is not `array` type in OpenAPI doc",
+    "mergedAt": "2026-01-11T14:37:48Z",
+    "url": "https://github.com/apiflask/apiflask/pull/725",
+    "src_files": [
+      "src/apiflask/schema_adapters/registry.py"
+    ],
+    "docs_files_touched": [],
+    "ground_truth_docs_affected": false
+  },
+  {
+    "number": 715,
+    "title": "Support upload file model",
+    "mergedAt": "2026-03-21T11:00:13Z",
+    "url": "https://github.com/apiflask/apiflask/pull/715",
+    "src_files": [
+      "src/apiflask/fields.py",
+      "src/apiflask/helpers.py",
+      "src/apiflask/schema_adapters/pydantic.py",
+      "src/apiflask/settings.py",
+      "src/apiflask/validators.py"
+    ],
+    "docs_files_touched": [
+      "docs/request.md",
+      "docs/response.md"
+    ],
+    "ground_truth_docs_affected": true
+  },
+  {
+    "number": 713,
+    "title": "Support pagination with Pydantic",
+    "mergedAt": "2025-12-10T13:08:27Z",
+    "url": "https://github.com/apiflask/apiflask/pull/713",
+    "src_files": [
+      "src/apiflask/__init__.py",
+      "src/apiflask/helpers.py",
+      "src/apiflask/schemas.py"
+    ],
+    "docs_files_touched": [
+      "docs/response.md"
+    ],
+    "ground_truth_docs_affected": true
+  },
+  {
+    "number": 712,
+    "title": "Release 3.0.2",
+    "mergedAt": "2025-11-20T15:35:43Z",
+    "url": "https://github.com/apiflask/apiflask/pull/712",
+    "src_files": [
+      "src/apiflask/scaffold.py"
+    ],
+    "docs_files_touched": [],
+    "ground_truth_docs_affected": false
+  },
+  {
+    "number": 710,
+    "title": "Fix @input and @output SchemaType error for Pydantic",
+    "mergedAt": "2025-11-20T15:22:22Z",
+    "url": "https://github.com/apiflask/apiflask/pull/710",
+    "src_files": [
+      "src/apiflask/types.py"
+    ],
+    "docs_files_touched": [],
+    "ground_truth_docs_affected": false
+  },
+  {
+    "number": 708,
+    "title": "Fix response model Field alias",
+    "mergedAt": "2025-11-19T14:03:27Z",
+    "url": "https://github.com/apiflask/apiflask/pull/708",
+    "src_files": [
+      "src/apiflask/schema_adapters/pydantic.py"
+    ],
+    "docs_files_touched": [
+      "docs/usage.md"
+    ],
+    "ground_truth_docs_affected": true
+  },
+  {
+    "number": 695,
+    "title": "Fix DelimitedList support",
+    "mergedAt": "2025-11-15T07:11:45Z",
+    "url": "https://github.com/apiflask/apiflask/pull/695",
+    "src_files": [
+      "src/apiflask/openapi_adapters.py"
+    ],
+    "docs_files_touched": [],
+    "ground_truth_docs_affected": false
+  },
+  {
+    "number": 694,
+    "title": "Deprecate EmptySchema",
+    "mergedAt": "2025-11-15T04:43:29Z",
+    "url": "https://github.com/apiflask/apiflask/pull/694",
+    "src_files": [
+      "src/apiflask/__init__.py",
+      "src/apiflask/schemas.py"
+    ],
+    "docs_files_touched": [
+      "docs/openapi.md",
+      "docs/response.md"
+    ],
+    "ground_truth_docs_affected": true
+  },
+  {
+    "number": 693,
+    "title": "Update the default schema name resolver",
+    "mergedAt": "2025-11-15T04:12:36Z",
+    "url": "https://github.com/apiflask/apiflask/pull/693",
+    "src_files": [
+      "src/apiflask/app.py",
+      "src/apiflask/schema_adapters/marshmallow.py"
+    ],
+    "docs_files_touched": [
+      "docs/schema/marshmallow.md"
+    ],
+    "ground_truth_docs_affected": true
+  },
+  {
+    "number": 691,
+    "title": "Add Pydantic support",
+    "mergedAt": "2025-11-14T15:03:19Z",
+    "url": "https://github.com/apiflask/apiflask/pull/691",
+    "src_files": [
+      "src/apiflask/app.py",
+      "src/apiflask/openapi_adapters.py",
+      "src/apiflask/scaffold.py",
+      "src/apiflask/schema_adapters/base.py",
+      "src/apiflask/schema_adapters/marshmallow.py",
+      "src/apiflask/schema_adapters/pydantic.py",
+      "src/apiflask/schema_adapters/registry.py"
+    ],
+    "docs_files_touched": [
+      "docs/api/schema_adapters.md",
+      "docs/api/schemas.md",
+      "docs/comparison.md",
+      "docs/migration_guide.md",
+      "docs/response.md",
+      "docs/schema/index.md",
+      "docs/schema/marshmallow.md",
+      "docs/schema/pydantic.md",
+      "docs/usage.md"
+    ],
+    "ground_truth_docs_affected": true
+  },
+  {
+    "number": 690,
+    "title": "Decouple from marshmallow",
+    "mergedAt": "2025-11-12T13:49:52Z",
+    "url": "https://github.com/apiflask/apiflask/pull/690",
+    "src_files": [
+      "src/apiflask/app.py",
+      "src/apiflask/openapi_adapters.py",
+      "src/apiflask/scaffold.py",
+      "src/apiflask/schema_adapters/__init__.py",
+      "src/apiflask/schema_adapters/base.py",
+      "src/apiflask/schema_adapters/marshmallow.py",
+      "src/apiflask/schema_adapters/registry.py"
+    ],
+    "docs_files_touched": [],
+    "ground_truth_docs_affected": false
+  },
+  {
+    "number": 689,
+    "title": "Support Python3.14",
+    "mergedAt": "2025-11-14T15:40:46Z",
+    "url": "https://github.com/apiflask/apiflask/pull/689",
+    "src_files": [
+      "src/apiflask/schema_adapters/pydantic.py"
+    ],
+    "docs_files_touched": [],
+    "ground_truth_docs_affected": false
+  },
+  {
+    "number": 678,
+    "title": "Add return type information from APIFlask route method helpers",
+    "mergedAt": "2025-10-04T06:02:34Z",
+    "url": "https://github.com/apiflask/apiflask/pull/678",
+    "src_files": [
+      "src/apiflask/scaffold.py"
+    ],
+    "docs_files_touched": [],
+    "ground_truth_docs_affected": false
+  },
+  {
+    "number": 665,
+    "title": "feat(#604): MultiAuth - Support for a runtime choice of Authentication methods",
+    "mergedAt": "2025-11-15T03:03:01Z",
+    "url": "https://github.com/apiflask/apiflask/pull/665",
+    "src_files": [
+      "src/apiflask/__init__.py",
+      "src/apiflask/app.py",
+      "src/apiflask/openapi.py",
+      "src/apiflask/scaffold.py",
+      "src/apiflask/security.py",
+      "src/apiflask/types.py"
+    ],
+    "docs_files_touched": [
+      "docs/api/security.md",
+      "docs/authentication.md",
+      "docs/migration_guide.md"
+    ],
+    "ground_truth_docs_affected": true
+  },
+  {
+    "number": 659,
+    "title": "fix(#618): `MethodView` with subclass",
+    "mergedAt": "2025-05-04T03:52:38Z",
+    "url": "https://github.com/apiflask/apiflask/pull/659",
+    "src_files": [
+      "src/apiflask/route.py"
+    ],
+    "docs_files_touched": [],
+    "ground_truth_docs_affected": false
+  },
+  {
+    "number": 650,
+    "title": "Replace UNPKG w/ jsDelivr",
+    "mergedAt": "2025-03-22T15:40:30Z",
+    "url": "https://github.com/apiflask/apiflask/pull/650",
+    "src_files": [
+      "src/apiflask/settings.py"
+    ],
+    "docs_files_touched": [
+      "docs/configuration.md"
+    ],
+    "ground_truth_docs_affected": true
+  },
+  {
+    "number": 642,
+    "title": "Add parameter 'docs_oauth2_redirect_path_external' to support absolute redirect url.",
+    "mergedAt": "2025-01-03T10:18:35Z",
+    "url": "https://github.com/apiflask/apiflask/pull/642",
+    "src_files": [
+      "src/apiflask/app.py"
+    ],
+    "docs_files_touched": [],
+    "ground_truth_docs_affected": false
+  },
+  {
+    "number": 632,
+    "title": "Modify response headers to be compliant with OAS 3.0.0+",
+    "mergedAt": "2024-12-15T14:17:13Z",
+    "url": "https://github.com/apiflask/apiflask/pull/632",
+    "src_files": [
+      "src/apiflask/app.py"
+    ],
+    "docs_files_touched": [],
+    "ground_truth_docs_affected": false
+  },
+  {
+    "number": 630,
+    "title": "Modify input validation skip to use webargs implementation",
+    "mergedAt": "2024-12-15T14:10:41Z",
+    "url": "https://github.com/apiflask/apiflask/pull/630",
+    "src_files": [
+      "src/apiflask/scaffold.py"
+    ],
+    "docs_files_touched": [],
+    "ground_truth_docs_affected": false
+  },
+  {
+    "number": 627,
+    "title": "Include input documentation in API spec when skipping validation",
+    "mergedAt": "2024-12-07T13:07:23Z",
+    "url": "https://github.com/apiflask/apiflask/pull/627",
+    "src_files": [
+      "src/apiflask/scaffold.py"
+    ],
+    "docs_files_touched": [],
+    "ground_truth_docs_affected": false
+  },
+  {
+    "number": 615,
+    "title": "Add flag to allow disabling of validation on input(issue 573)",
+    "mergedAt": "2024-10-27T12:43:10Z",
+    "url": "https://github.com/apiflask/apiflask/pull/615",
+    "src_files": [
+      "src/apiflask/scaffold.py"
+    ],
+    "docs_files_touched": [
+      "docs/usage.md"
+    ],
+    "ground_truth_docs_affected": true
+  },
+  {
+    "number": 605,
+    "title": "Fix OpenAPI spec for multiple content types (json_for_form)",
+    "mergedAt": "2024-09-08T05:11:09Z",
+    "url": "https://github.com/apiflask/apiflask/pull/605",
+    "src_files": [
+      "src/apiflask/app.py",
+      "src/apiflask/scaffold.py"
+    ],
+    "docs_files_touched": [
+      "docs/request.md"
+    ],
+    "ground_truth_docs_affected": true
+  },
+  {
+    "number": 599,
+    "title": "Release 2.2.0",
+    "mergedAt": "2024-08-03T14:29:39Z",
+    "url": "https://github.com/apiflask/apiflask/pull/599",
+    "src_files": [
+      "src/apiflask/app.py"
+    ],
+    "docs_files_touched": [],
+    "ground_truth_docs_affected": false
+  },
+  {
+    "number": 590,
+    "title": "Replace flake8 with Ruff",
+    "mergedAt": "2024-07-23T09:31:31Z",
+    "url": "https://github.com/apiflask/apiflask/pull/590",
+    "src_files": [
+      "src/apiflask/__init__.py",
+      "src/apiflask/app.py",
+      "src/apiflask/blueprint.py",
+      "src/apiflask/commands.py",
+      "src/apiflask/exceptions.py",
+      "src/apiflask/fields.py",
+      "src/apiflask/helpers.py",
+      "src/apiflask/openapi.py",
+      "src/apiflask/route.py",
+      "src/apiflask/scaffold.py",
+      "src/apiflask/schemas.py",
+      "src/apiflask/security.py",
+      "src/apiflask/types.py"
+    ],
+    "docs_files_touched": [],
+    "ground_truth_docs_affected": false
+  },
+  {
+    "number": 589,
+    "title": "Support adding custom field to operation object (view function) #571",
+    "mergedAt": "2024-07-24T07:16:19Z",
+    "url": "https://github.com/apiflask/apiflask/pull/589",
+    "src_files": [
+      "src/apiflask/app.py",
+      "src/apiflask/scaffold.py"
+    ],
+    "docs_files_touched": [
+      "docs/openapi.md"
+    ],
+    "ground_truth_docs_affected": true
+  },
+  {
+    "number": 585,
+    "title": "Use postponed evaluation of annotations",
+    "mergedAt": "2024-07-19T13:45:40Z",
+    "url": "https://github.com/apiflask/apiflask/pull/585",
+    "src_files": [
+      "src/apiflask/app.py",
+      "src/apiflask/blueprint.py",
+      "src/apiflask/exceptions.py",
+      "src/apiflask/helpers.py",
+      "src/apiflask/openapi.py",
+      "src/apiflask/route.py",
+      "src/apiflask/scaffold.py",
+      "src/apiflask/schemas.py",
+      "src/apiflask/security.py",
+      "src/apiflask/settings.py",
+      "src/apiflask/types.py"
+    ],
+    "docs_files_touched": [],
+    "ground_truth_docs_affected": false
+  },
+  {
+    "number": 578,
+    "title": "Skip data serialization for FileSchema output",
+    "mergedAt": "2024-07-03T14:00:54Z",
+    "url": "https://github.com/apiflask/apiflask/pull/578",
+    "src_files": [
+      "src/apiflask/scaffold.py"
+    ],
+    "docs_files_touched": [],
+    "ground_truth_docs_affected": false
+  },
+  {
+    "number": 560,
+    "title": "Switch to pyproject.toml",
+    "mergedAt": "2024-04-21T09:06:41Z",
+    "url": "https://github.com/apiflask/apiflask/pull/560",
+    "src_files": [
+      "src/apiflask/__init__.py"
+    ],
+    "docs_files_touched": [],
+    "ground_truth_docs_affected": false
+  },
+  {
+    "number": 550,
+    "title": "Add support for a --quiet flag to the flask spec command",
+    "mergedAt": "2024-03-04T10:20:22Z",
+    "url": "https://github.com/apiflask/apiflask/pull/550",
+    "src_files": [
+      "src/apiflask/commands.py"
+    ],
+    "docs_files_touched": [
+      "docs/openapi.md"
+    ],
+    "ground_truth_docs_affected": true
+  },
+  {
+    "number": 549,
+    "title": "Fix spec command for complex data types",
+    "mergedAt": "2024-03-07T13:59:11Z",
+    "url": "https://github.com/apiflask/apiflask/pull/549",
+    "src_files": [
+      "src/apiflask/app.py",
+      "src/apiflask/commands.py"
+    ],
+    "docs_files_touched": [],
+    "ground_truth_docs_affected": false
+  },
+  {
+    "number": 543,
+    "title": "Reuse the File, Config field, and file-related validators from flask-marshmallow",
+    "mergedAt": "2024-02-22T00:47:36Z",
+    "url": "https://github.com/apiflask/apiflask/pull/543",
+    "src_files": [
+      "src/apiflask/fields.py",
+      "src/apiflask/helpers.py",
+      "src/apiflask/validators.py"
+    ],
+    "docs_files_touched": [
+      "docs/schema.md"
+    ],
+    "ground_truth_docs_affected": true
+  },
+  {
+    "number": 539,
+    "title": "Ignore module import type error",
+    "mergedAt": "2024-02-04T10:52:44Z",
+    "url": "https://github.com/apiflask/apiflask/pull/539",
+    "src_files": [
+      "src/apiflask/app.py"
+    ],
+    "docs_files_touched": [],
+    "ground_truth_docs_affected": false
+  },
+  {
+    "number": 536,
+    "title": "perf: optimize `get_filestorage_size`",
+    "mergedAt": "2024-02-05T10:57:00Z",
+    "url": "https://github.com/apiflask/apiflask/pull/536",
+    "src_files": [
+      "src/apiflask/helpers.py"
+    ],
+    "docs_files_touched": [],
+    "ground_truth_docs_affected": false
+  },
+  {
+    "number": 533,
+    "title": "fix: correct the return type of abort()",
+    "mergedAt": "2024-01-17T15:17:04Z",
+    "url": "https://github.com/apiflask/apiflask/pull/533",
+    "src_files": [
+      "src/apiflask/exceptions.py"
+    ],
+    "docs_files_touched": [],
+    "ground_truth_docs_affected": false
+  },
+  {
+    "number": 531,
+    "title": "Remove override of set_class in Schema",
+    "mergedAt": "2024-02-04T13:48:48Z",
+    "url": "https://github.com/apiflask/apiflask/pull/531",
+    "src_files": [
+      "src/apiflask/schemas.py"
+    ],
+    "docs_files_touched": [],
+    "ground_truth_docs_affected": false
+  },
+  {
+    "number": 530,
+    "title": "Update pyupgrade; use --py38-plus",
+    "mergedAt": "2024-01-13T05:31:14Z",
+    "url": "https://github.com/apiflask/apiflask/pull/530",
+    "src_files": [
+      "src/apiflask/types.py"
+    ],
+    "docs_files_touched": [],
+    "ground_truth_docs_affected": false
+  }
+]
