@@ -195,10 +195,8 @@ def call_worker(system_prompt, user_prompt, repo, is_private, oidc_token):
             result = json.loads(resp.read())
         return result["docs_should_update"], result.get("reason", "")
     except urllib.error.HTTPError as e:
-        raw_body = e.read()
-        print(f"  DEBUG: HTTPError code={e.code} raw_body={raw_body!r}", file=sys.stderr)
         try:
-            body = json.loads(raw_body)
+            body = json.loads(e.read())
         except json.JSONDecodeError:
             body = {}
         if e.code == 402:
