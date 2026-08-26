@@ -113,18 +113,23 @@ async function handlePaddleWebhook(req: Request, env: Env): Promise<Response> {
 
 export default {
   async fetch(req: Request, env: Env): Promise<Response> {
-    const url = new URL(req.url);
+    try {
+      const url = new URL(req.url);
 
-    if (req.method === "POST" && url.pathname === "/v1/evaluate") {
-      return handleEvaluate(req, env);
-    }
-    if (req.method === "POST" && url.pathname === "/v1/webhook/paddle") {
-      return handlePaddleWebhook(req, env);
-    }
-    if (req.method === "GET" && url.pathname === "/checkout") {
-      return handleCheckoutPage(req, env);
-    }
+      if (req.method === "POST" && url.pathname === "/v1/evaluate") {
+        return await handleEvaluate(req, env);
+      }
+      if (req.method === "POST" && url.pathname === "/v1/webhook/paddle") {
+        return await handlePaddleWebhook(req, env);
+      }
+      if (req.method === "GET" && url.pathname === "/checkout") {
+        return await handleCheckoutPage(req, env);
+      }
 
-    return new Response("Not found", { status: 404 });
+      return new Response("Not found", { status: 404 });
+    } catch (err) {
+      console.error("Unhandled error:", err);
+      return json({ error: "internal_error" }, 500);
+    }
   },
 };
