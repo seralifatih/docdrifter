@@ -25,7 +25,7 @@ and raw results are in [`data/`](data/).
 name: DocDrifter
 on:
   pull_request:
-    types: [opened, synchronize, reopened]
+    types: [opened, synchronize, reopened, labeled, unlabeled]
 
 permissions:
   pull-requests: write

@@ -2,7 +2,7 @@ name: DocDrifter (dogfood)
 
 on:
   pull_request:
-    types: [opened, synchronize, reopened]
+    types: [opened, synchronize, reopened, labeled, unlabeled]
 
 permissions:
   pull-requests: write
