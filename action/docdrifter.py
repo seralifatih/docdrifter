@@ -101,7 +101,7 @@ def env(name, required=True, default=None):
     if required and not val:
         print(f"ERROR: missing required env var {name}", file=sys.stderr)
         sys.exit(1)
-    return val
+    return val.strip() if val else val
 
 
 def gh_request(method, path, token, body=None):
@@ -189,12 +189,16 @@ def call_worker(system_prompt, user_prompt, repo, is_private, oidc_token):
     )
     req.add_header("Authorization", f"Bearer {oidc_token}")
     req.add_header("Content-Type", "application/json")
+    req.add_header("User-Agent", "docdrifter-action")
     try:
         with urllib.request.urlopen(req) as resp:
             result = json.loads(resp.read())
         return result["docs_should_update"], result.get("reason", "")
     except urllib.error.HTTPError as e:
-        body = json.loads(e.read())
+        try:
+            body = json.loads(e.read())
+        except json.JSONDecodeError:
+            body = {}
         if e.code == 402:
             raise NotLicensed(body.get("message", ""), body.get("checkout_url", ""))
         print(f"  WARN: DocDrifter backend returned {e.code}: {body}", file=sys.stderr)
