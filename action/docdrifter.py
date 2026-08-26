@@ -189,6 +189,7 @@ def call_worker(system_prompt, user_prompt, repo, is_private, oidc_token):
     )
     req.add_header("Authorization", f"Bearer {oidc_token}")
     req.add_header("Content-Type", "application/json")
+    req.add_header("User-Agent", "docdrifter-action")
     try:
         with urllib.request.urlopen(req) as resp:
             result = json.loads(resp.read())
