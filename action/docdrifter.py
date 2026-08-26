@@ -13,9 +13,10 @@ Required env vars:
   PR_NUMBER        - the pull request number to check
 
 Configured via action inputs (passed as env vars by action.yml):
-  SRC_PATH   - path prefix for source files, e.g. "src/"
-  DOCS_PATH  - path prefix for docs files, e.g. "docs/"
-  REPO_DESC  - one-line description of the project, for the LLM prompt
+  SRC_PATH    - path prefix for source files, e.g. "src/"
+  DOCS_PATH   - path prefix for docs files, e.g. "docs/"
+  REPO_DESC   - one-line description of the project, for the LLM prompt
+  SKIP_LABELS - comma-separated PR labels that bypass the check (case-insensitive)
 """
 import json
 import os
@@ -121,9 +122,8 @@ def get_pr_files(repo, pr_number, token):
     return files
 
 
-def get_pr_title(repo, pr_number, token):
-    pr = gh_request("GET", f"/repos/{repo}/pulls/{pr_number}", token)
-    return pr["title"]
+def get_pr(repo, pr_number, token):
+    return gh_request("GET", f"/repos/{repo}/pulls/{pr_number}", token)
 
 
 def build_user_prompt(title, files, src_path):
@@ -181,11 +181,6 @@ def delete_existing_comment_if_any(repo, pr_number, token):
         gh_request("DELETE", f"/repos/{repo}/issues/comments/{existing_id}", token)
 
 
-def get_pr_labels(repo, pr_number, token):
-    pr = gh_request("GET", f"/repos/{repo}/pulls/{pr_number}", token)
-    return {label["name"] for label in pr.get("labels", [])}
-
-
 def main():
     token = env("GITHUB_TOKEN")
     api_key = env("DEEPSEEK_API_KEY")
@@ -195,14 +190,9 @@ def main():
     docs_path = env("DOCS_PATH", required=False, default="docs/")
     repo_desc = env("REPO_DESC", required=False, default="a software project")
     skip_labels = {
-        l.strip() for l in env("SKIP_LABELS", required=False, default="").split(",") if l.strip()
+        l.strip().lower()
+        for l in env("SKIP_LABELS", required=False, default="").split(",") if l.strip()
     }
-
-    if skip_labels:
-        pr_labels = get_pr_labels(repo, pr_number, token)
-        if pr_labels & skip_labels:
-            print(f"PR has a skip label ({pr_labels & skip_labels}), skipping.")
-            return
 
     files = get_pr_files(repo, pr_number, token)
     src_changed = [f for f in files if f["filename"].startswith(src_path)]
@@ -217,7 +207,17 @@ def main():
         delete_existing_comment_if_any(repo, pr_number, token)
         return
 
-    title = get_pr_title(repo, pr_number, token)
+    pr = get_pr(repo, pr_number, token)
+
+    if skip_labels:
+        pr_labels = {label["name"].lower() for label in pr.get("labels", [])}
+        matched = pr_labels & skip_labels
+        if matched:
+            print(f"PR has a skip label ({', '.join(matched)}), skipping.")
+            delete_existing_comment_if_any(repo, pr_number, token)
+            return
+
+    title = pr["title"]
     system_prompt = SYSTEM_PROMPT_TEMPLATE.format(repo_desc=repo_desc, docs_path=f"{docs_path}*")
     user_prompt = build_user_prompt(title, files, src_path)
 
