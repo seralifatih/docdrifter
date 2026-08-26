@@ -101,7 +101,7 @@ def env(name, required=True, default=None):
     if required and not val:
         print(f"ERROR: missing required env var {name}", file=sys.stderr)
         sys.exit(1)
-    return val
+    return val.strip() if val else val
 
 
 def gh_request(method, path, token, body=None):
