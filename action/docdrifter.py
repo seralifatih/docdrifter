@@ -181,6 +181,11 @@ def delete_existing_comment_if_any(repo, pr_number, token):
         gh_request("DELETE", f"/repos/{repo}/issues/comments/{existing_id}", token)
 
 
+def get_pr_labels(repo, pr_number, token):
+    pr = gh_request("GET", f"/repos/{repo}/pulls/{pr_number}", token)
+    return {label["name"] for label in pr.get("labels", [])}
+
+
 def main():
     token = env("GITHUB_TOKEN")
     api_key = env("DEEPSEEK_API_KEY")
@@ -189,6 +194,15 @@ def main():
     src_path = env("SRC_PATH", required=False, default="src/")
     docs_path = env("DOCS_PATH", required=False, default="docs/")
     repo_desc = env("REPO_DESC", required=False, default="a software project")
+    skip_labels = {
+        l.strip() for l in env("SKIP_LABELS", required=False, default="").split(",") if l.strip()
+    }
+
+    if skip_labels:
+        pr_labels = get_pr_labels(repo, pr_number, token)
+        if pr_labels & skip_labels:
+            print(f"PR has a skip label ({pr_labels & skip_labels}), skipping.")
+            return
 
     files = get_pr_files(repo, pr_number, token)
     src_changed = [f for f in files if f["filename"].startswith(src_path)]
