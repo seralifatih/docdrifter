@@ -92,6 +92,7 @@ section { padding: calc(2.2 * var(--leading)) 0; }
   <a href="#evidence">Evidence</a>
   <a href="#pricing">Pricing</a>
   <a href="/blog">Blog</a>
+  <a href="/dashboard">Dashboard</a>
   <button type="button" id="theme-toggle" class="theme-toggle">Dark</button>
   <a href="#install" class="btn btn-primary">Install</a>
 </nav>
