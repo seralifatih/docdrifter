@@ -5,6 +5,7 @@ import { verifyPaddleSignature, handlePaddleEvent, createPortalSessionUrl } from
 import { checkoutPage } from "./checkout";
 import { statusPageActive, statusPageNeedsActivation } from "./status";
 import { landingPage } from "./landing";
+import { verifyGithubWebhookSignature, handleGithubWebhookEvent } from "./githubApp";
 
 export interface Env {
   DB: D1Database;
@@ -17,6 +18,10 @@ export interface Env {
   PRICE_LABEL: string; // e.g. "Single repo — $9 / month"
   PRICE_AMOUNT: string; // e.g. "$9"
   PRICE_UNIT: string; // e.g. "per month\nper private repo"
+  GITHUB_APP_CLIENT_ID: string;
+  GITHUB_APP_CLIENT_SECRET: string;
+  GITHUB_WEBHOOK_SECRET: string;
+  STATE_SECRET: string;
 }
 
 function json(body: unknown, status = 200): Response {
@@ -140,6 +145,26 @@ async function handlePaddleWebhook(req: Request, env: Env): Promise<Response> {
   }
 }
 
+async function handleGithubWebhook(req: Request, env: Env): Promise<Response> {
+  const raw = await req.text();
+  const valid = await verifyGithubWebhookSignature(
+    req.headers.get("X-Hub-Signature-256"),
+    raw,
+    env.GITHUB_WEBHOOK_SECRET
+  );
+  if (!valid) {
+    return json({ error: "invalid_signature" }, 401);
+  }
+
+  try {
+    await handleGithubWebhookEvent(env.DB, req.headers.get("X-GitHub-Event"), raw);
+    return json({ ok: true }, 200);
+  } catch (err) {
+    // Non-2xx so GitHub retries rather than silently dropping an install event.
+    return json({ error: "processing_failed" }, 500);
+  }
+}
+
 export default {
   async fetch(req: Request, env: Env): Promise<Response> {
     try {
@@ -150,6 +175,9 @@ export default {
       }
       if (req.method === "POST" && url.pathname === "/v1/webhook/paddle") {
         return await handlePaddleWebhook(req, env);
+      }
+      if (req.method === "POST" && url.pathname === "/webhook/github") {
+        return await handleGithubWebhook(req, env);
       }
       if (req.method === "GET" && url.pathname === "/checkout") {
         return await handleCheckoutPage(req, env);
