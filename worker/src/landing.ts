@@ -17,9 +17,11 @@ ${FAVICON_TAG}
 <meta property="og:title" content="DocDrifter — docs that quietly stop being true">
 <meta property="og:description" content="${DESCRIPTION}">
 <meta property="og:url" content="https://docdrifter.com/">
-<meta name="twitter:card" content="summary">
+<meta property="og:image" content="https://docdrifter.com/og-image.svg">
+<meta name="twitter:card" content="summary_large_image">
 <meta name="twitter:title" content="DocDrifter — docs that quietly stop being true">
 <meta name="twitter:description" content="${DESCRIPTION}">
+<meta name="twitter:image" content="https://docdrifter.com/og-image.svg">
 ${THEME_INIT_SCRIPT}
 <style>
 ${BASE_STYLES}

@@ -237,18 +237,38 @@ export interface RepoInstallation {
 // (if any) covers it, and is that repo private. Returns null if the App
 // isn't installed on this repo -- private repos require the App to be
 // licensed at all (see PRIVATE_REPO_REQUIRES_APP note in index.ts).
+//
+// `repo` is not unique in installation_repos (PK is installation_id+repo),
+// so more than one installation can legitimately claim the same repo name
+// -- most plausibly after a repo transfer between two accounts that both
+// have the App installed, if GitHub's installation_repositories webhooks
+// don't cleanly remove the old row (there's no dedicated `repository`
+// transfer-event handling here, only installation-level add/remove). Since
+// this decides billing, silently taking an arbitrary row via LIMIT 1 was
+// the wrong call -- pick the most recently updated installation instead
+// (most likely to be the current real owner) and log the ambiguity so it's
+// visible rather than silently resolved.
 export async function getInstallationForRepo(db: D1Database, repo: string): Promise<RepoInstallation | null> {
-  const row = await db
+  const result = await db
     .prepare(
       `SELECT ir.installation_id as installationId, ir.is_private as isPrivate, i.account_login as accountLogin
        FROM installation_repos ir
        JOIN installations i ON i.id = ir.installation_id
        WHERE ir.repo = ?
-       LIMIT 1`
+       ORDER BY i.updated_at DESC`
     )
     .bind(repo.toLowerCase())
-    .first<{ installationId: number; isPrivate: number; accountLogin: string }>();
-  if (!row) return null;
+    .all<{ installationId: number; isPrivate: number; accountLogin: string }>();
+
+  const rows = result.results ?? [];
+  if (rows.length === 0) return null;
+  if (rows.length > 1) {
+    console.error(
+      `Repo ${repo.toLowerCase()} is claimed by ${rows.length} installations ` +
+        `(${rows.map((r) => r.installationId).join(", ")}); using the most recently updated one.`
+    );
+  }
+  const row = rows[0];
   return { installationId: row.installationId, isPrivate: row.isPrivate === 1, accountLogin: row.accountLogin };
 }
 

@@ -15,7 +15,12 @@ let cached: Post[] | null = null;
 
 export function getAllPosts(): Post[] {
   if (!cached) {
-    cached = RAW_POSTS.map((p) => parsePost(p.slug, p.raw)).sort((a, b) => (a.date < b.date ? 1 : -1));
+    // Comparator returns 0 on equal dates (not -1/1) so Array.sort's
+    // guaranteed stability preserves RAW_POSTS' own order as the tiebreaker
+    // -- otherwise two same-dated posts get an order that isn't the
+    // declared "newest first" intent, it's whatever the sort's internal
+    // swap happens to produce.
+    cached = RAW_POSTS.map((p) => parsePost(p.slug, p.raw)).sort((a, b) => (a.date === b.date ? 0 : a.date < b.date ? 1 : -1));
   }
   return cached;
 }

@@ -1,7 +1,7 @@
 ---
 title: How we measured DocDrifter's precision and recall (and why the raw numbers matter)
 description: We hand-labeled 92 real pull requests across two open-source repos, found two mistakes in our own ground truth, and decided to publish both the raw and corrected numbers instead of picking the flattering one.
-date: 2026-08-27
+date: 2026-08-26
 ---
 
 Before writing a line of the GitHub Action, we needed to know one thing: does an LLM reading a PR diff actually predict whether the docs need an update, better than the obvious heuristic everyone writes first?

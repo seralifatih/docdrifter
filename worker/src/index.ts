@@ -30,6 +30,9 @@ import { handleGithubLogin, handleGithubCallback, handleLogout, getSessionCookie
 import { dashboardPage } from "./dashboard";
 import { getAllPosts, getPost } from "./posts";
 import { blogIndexPage, blogPostPage, blogRssFeed } from "./blog";
+import { robotsTxt, sitemapXml } from "./seo";
+import { notFoundPage } from "./notfound";
+import { ogImageSvg } from "./ogimage";
 
 export interface Env {
   DB: D1Database;
@@ -423,6 +426,17 @@ export default {
       if (req.method === "GET" && url.pathname === "/") {
         return new Response(landingPage(), { headers: { "Content-Type": "text/html; charset=utf-8" } });
       }
+      if (req.method === "GET" && url.pathname === "/robots.txt") {
+        return new Response(robotsTxt(), { headers: { "Content-Type": "text/plain; charset=utf-8" } });
+      }
+      if (req.method === "GET" && url.pathname === "/sitemap.xml") {
+        return new Response(sitemapXml(getAllPosts()), { headers: { "Content-Type": "application/xml; charset=utf-8" } });
+      }
+      if (req.method === "GET" && url.pathname === "/og-image.svg") {
+        return new Response(ogImageSvg(), {
+          headers: { "Content-Type": "image/svg+xml; charset=utf-8", "Cache-Control": "public, max-age=86400" },
+        });
+      }
       if (req.method === "GET" && url.pathname === "/privacy") {
         return new Response(privacyPage(), { headers: { "Content-Type": "text/html; charset=utf-8" } });
       }
@@ -439,12 +453,12 @@ export default {
         const slug = url.pathname.slice("/blog/".length);
         const post = getPost(slug);
         if (!post) {
-          return new Response("Not found", { status: 404 });
+          return new Response(notFoundPage(), { status: 404, headers: { "Content-Type": "text/html; charset=utf-8" } });
         }
         return new Response(blogPostPage(post), { headers: { "Content-Type": "text/html; charset=utf-8" } });
       }
 
-      return new Response("Not found", { status: 404 });
+      return new Response(notFoundPage(), { status: 404, headers: { "Content-Type": "text/html; charset=utf-8" } });
     } catch (err) {
       console.error("Unhandled error:", err);
       return json({ error: "internal_error" }, 500);

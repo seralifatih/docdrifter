@@ -62,9 +62,11 @@ ${FAVICON_TAG}
 <meta property="og:title" content="${esc(title)}">
 <meta property="og:description" content="${esc(description)}">
 <meta property="og:url" content="${esc(ogUrl)}">
-<meta name="twitter:card" content="summary">
+<meta property="og:image" content="https://docdrifter.com/og-image.svg">
+<meta name="twitter:card" content="summary_large_image">
 <meta name="twitter:title" content="${esc(title)}">
 <meta name="twitter:description" content="${esc(description)}">
+<meta name="twitter:image" content="https://docdrifter.com/og-image.svg">
 ${THEME_INIT_SCRIPT}
 <style>
 ${BASE_STYLES}
