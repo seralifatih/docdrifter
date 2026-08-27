@@ -1,3 +1,4 @@
+// Domain migration smoke test: no behavior change.
 export interface DriftVerdict {
   docs_should_update: boolean;
   reason: string;
