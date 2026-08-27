@@ -20,7 +20,7 @@
     "PADDLE_PRICE_ID": "pri_01m0zv1fn8rsj6xhgjxydxavqd",
     "PADDLE_CLIENT_TOKEN": "live_1b3d2879563153f1ce6576b5189",
     "PRICE_AMOUNT": "$9",
-    "PRICE_UNIT": "per repo / month\nvolume pricing in Paddle checkout",
+    "PRICE_UNIT": "per repo / month\nbilled for every private repo on this installation",
     "GITHUB_APP_CLIENT_ID": "Iv23ctoP6jHaTcYmqEjC"
   },
   "observability": {

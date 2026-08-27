@@ -59,10 +59,10 @@ p.lede { font-size: 14px; line-height: 21px; color: var(--color-text-muted); mar
     <p class="lede">This subscription covers every private repo under this GitHub installation — not just <code>${safeRepo}</code>. Public repos stay free and don't count toward the total.</p>
     <div class="divider"></div>
     <div class="price-row">
-      <span class="price">$9</span>
-      <span class="price-unit">/ repo / month<br>volume pricing applies at checkout</span>
+      <span class="price">$${qty * 9}</span>
+      <span class="price-unit">/ month<br>$9 × ${qty} private repo${qty === 1 ? "" : "s"}</span>
     </div>
-    <p class="qty-note">${qty} private repo${qty === 1 ? "" : "s"} on this installation today</p>
+    <p class="qty-note">Adding a private repo later updates this automatically — no need to come back and re-subscribe.</p>
     <button id="checkout-btn" class="btn btn-primary">Subscribe</button>
     <p class="fine-print">Paddle checkout · cancel any time · <a href="/privacy">privacy</a> · <a href="/terms">terms</a></p>
   </div>

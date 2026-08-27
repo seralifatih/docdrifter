@@ -230,7 +230,7 @@ section { padding: calc(2.2 * var(--leading)) 0; }
           <span class="price-num">$9</span>
           <span style="font-family:var(--mono);font-size:14px;color:var(--color-text-muted)">/ repo / month</span>
         </div>
-        <p style="font-size:14px;line-height:22px;margin:10px 0 0;color:var(--color-text-muted);font-family:var(--mono)">one subscription per GitHub install, price drops as repo count grows</p>
+        <p style="font-size:14px;line-height:22px;margin:10px 0 0;color:var(--color-text-muted);font-family:var(--mono)">one subscription per GitHub install, billed per private repo</p>
         <div class="feature-list">
           <div class="feature-item"><span class="dot-mark">·</span><span>Everything in the free tier</span></div>
           <div class="feature-item"><span class="dot-mark">·</span><span>One subscription covers every private repo in your account or org</span></div>
@@ -241,7 +241,7 @@ section { padding: calc(2.2 * var(--leading)) 0; }
         <a href="#install" class="btn btn-secondary" style="margin-top:var(--leading)">Start on a private repo</a>
       </div>
     </div>
-    <p style="font-size:13.5px;line-height:22px;margin:var(--half) 0 0;color:var(--color-text-faint)">Billing is per GitHub installation, not per repo — install DocDrifter Dashboard once on your account or org, and one subscription's quantity tracks how many private repos it covers. Paddle applies volume price breaks automatically as that count grows; no separate subscription to manage for each repo.</p>
+    <p style="font-size:13.5px;line-height:22px;margin:var(--half) 0 0;color:var(--color-text-faint)">Billing is per GitHub installation, not per repo — install DocDrifter Dashboard once on your account or org, and one subscription's quantity tracks how many private repos it covers, at $9/repo/month flat. Add a private repo later and it's covered automatically; no separate subscription to set up for each one.</p>
   </section>
 
   <section id="install">
