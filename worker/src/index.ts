@@ -4,6 +4,7 @@ import { callDeepSeek } from "./deepseek";
 import { verifyPaddleSignature, handlePaddleEvent, createPortalSessionUrl } from "./paddle";
 import { checkoutPage } from "./checkout";
 import { statusPageActive, statusPageNeedsActivation } from "./status";
+import { landingPage } from "./landing";
 
 export interface Env {
   DB: D1Database;
@@ -155,6 +156,9 @@ export default {
       }
       if (req.method === "GET" && url.pathname === "/status") {
         return await handleStatusPage(req, env);
+      }
+      if (req.method === "GET" && url.pathname === "/") {
+        return new Response(landingPage(), { headers: { "Content-Type": "text/html; charset=utf-8" } });
       }
 
       return new Response("Not found", { status: 404 });
