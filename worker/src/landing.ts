@@ -96,6 +96,7 @@ section { padding: calc(2.2 * var(--leading)) 0; }
   <a href="#how">How it works</a>
   <a href="#evidence">Evidence</a>
   <a href="#pricing">Pricing</a>
+  <a href="/blog">Blog</a>
   <button type="button" id="theme-toggle" class="theme-toggle">Dark</button>
   <a href="#install" class="btn btn-primary">Install</a>
 </nav>
@@ -305,6 +306,7 @@ jobs:
     <div class="footer-row">
       <span style="font-family:var(--font-heading);font-weight:600;font-size:15px;color:var(--color-text)">DocDrifter</span>
       <a href="https://github.com/seralifatih/docdrifter" style="font-family:var(--mono);font-size:12.5px">github.com/seralifatih/docdrifter</a>
+      <a href="/blog" style="font-family:var(--mono);font-size:12.5px">blog</a>
       <a href="/privacy" style="font-family:var(--mono);font-size:12.5px">privacy</a>
       <a href="/terms" style="font-family:var(--mono);font-size:12.5px">terms</a>
       <span style="margin-left:auto;font-family:var(--mono);font-size:12.5px;letter-spacing:0.06em;text-transform:uppercase">Built for people who read the diff</span>

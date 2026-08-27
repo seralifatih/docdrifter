@@ -25,6 +25,8 @@ import { privacyPage, termsPage } from "./legal";
 import { verifyGithubWebhookSignature, handleGithubWebhookEvent } from "./githubApp";
 import { handleGithubLogin, handleGithubCallback, handleLogout, getSessionCookieValue } from "./auth";
 import { dashboardPage } from "./dashboard";
+import { getAllPosts, getPost } from "./posts";
+import { blogIndexPage, blogPostPage, blogRssFeed } from "./blog";
 
 export interface Env {
   DB: D1Database;
@@ -351,6 +353,20 @@ export default {
       }
       if (req.method === "GET" && url.pathname === "/terms") {
         return new Response(termsPage(), { headers: { "Content-Type": "text/html; charset=utf-8" } });
+      }
+      if (req.method === "GET" && url.pathname === "/blog") {
+        return new Response(blogIndexPage(getAllPosts()), { headers: { "Content-Type": "text/html; charset=utf-8" } });
+      }
+      if (req.method === "GET" && url.pathname === "/blog/rss.xml") {
+        return new Response(blogRssFeed(getAllPosts()), { headers: { "Content-Type": "application/rss+xml; charset=utf-8" } });
+      }
+      if (req.method === "GET" && url.pathname.startsWith("/blog/")) {
+        const slug = url.pathname.slice("/blog/".length);
+        const post = getPost(slug);
+        if (!post) {
+          return new Response("Not found", { status: 404 });
+        }
+        return new Response(blogPostPage(post), { headers: { "Content-Type": "text/html; charset=utf-8" } });
       }
 
       return new Response("Not found", { status: 404 });
