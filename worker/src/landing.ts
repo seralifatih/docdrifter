@@ -6,6 +6,14 @@ export function landingPage(): string {
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>DocDrifter — docs that quietly stop being true</title>
 <meta name="description" content="A GitHub Action that flags pull requests which change code but leave documentation untouched. Free for public repos.">
+<script>
+(function () {
+  try {
+    var saved = localStorage.getItem("docdrifter-theme");
+    if (saved) document.documentElement.setAttribute("data-theme", saved);
+  } catch (e) {}
+})();
+</script>
 <style>
 :root {
   --color-bg: #f3f2f2;
@@ -52,6 +60,8 @@ a:hover { text-decoration: underline; }
 nav { display: flex; align-items: center; gap: var(--leading); padding: 18px var(--edge); flex-wrap: wrap; }
 nav a { color: inherit; font-size: 14px; white-space: nowrap; }
 .nav-brand { font-family: var(--font-heading); font-weight: 600; font-size: 19px; margin-right: auto; letter-spacing: -0.01em; color: var(--color-text); }
+.theme-toggle { cursor: pointer; font-family: var(--mono); font-size: 11px; letter-spacing: 0.08em; text-transform: uppercase; color: var(--color-text); background: transparent; border: 1px solid var(--color-divider); border-radius: 2px; padding: 6px 10px; }
+.theme-toggle:hover { background: color-mix(in srgb, var(--color-text) 7%, transparent); }
 h1 { font-family: var(--font-heading); font-weight: 600; font-size: clamp(36px, 6vw, 68px); line-height: 1.08; letter-spacing: -0.02em; margin: 0; }
 h2 { font-family: var(--font-heading); font-weight: 600; letter-spacing: -0.015em; margin: 0; }
 .lede { font-size: 17px; line-height: var(--leading); max-width: var(--measure); margin: calc(var(--leading) * 1.3) 0 0; }
@@ -98,6 +108,7 @@ footer { padding: calc(1.5 * var(--leading)) 0 calc(2 * var(--leading)); font-si
   <a href="#how">How it works</a>
   <a href="#evidence">Evidence</a>
   <a href="#pricing">Pricing</a>
+  <button type="button" id="theme-toggle" class="theme-toggle">Dark</button>
   <a href="https://github.com/marketplace/actions/docdrifter" class="btn btn-primary">Install</a>
 </nav>
 
@@ -287,6 +298,34 @@ jobs:
   </footer>
 
 </div>
+<script>
+(function () {
+  var btn = document.getElementById("theme-toggle");
+  var root = document.documentElement;
+  function systemPrefersDark() {
+    return window.matchMedia && window.matchMedia("(prefers-color-scheme: dark)").matches;
+  }
+  function currentTheme() {
+    var attr = root.getAttribute("data-theme");
+    if (attr === "light" || attr === "dark") return attr;
+    return systemPrefersDark() ? "dark" : "light";
+  }
+  function label(theme) {
+    return theme === "dark" ? "Light" : "Dark";
+  }
+  function apply(theme) {
+    root.setAttribute("data-theme", theme);
+    try { localStorage.setItem("docdrifter-theme", theme); } catch (e) {}
+    if (btn) btn.textContent = label(theme);
+  }
+  if (btn) {
+    btn.textContent = label(currentTheme());
+    btn.addEventListener("click", function () {
+      apply(currentTheme() === "dark" ? "light" : "dark");
+    });
+  }
+})();
+</script>
 </body>
 </html>`;
 }
