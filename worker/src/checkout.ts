@@ -72,6 +72,7 @@ p.lede { font-size: 14px; line-height: 21px; color: var(--color-text-muted); mar
     </div>
     <p class="qty-note">Need more than one? Use the quantity stepper on the next screen — spare seats can be assigned to other private repos from your dashboard, no extra checkout.</p>
     <button id="checkout-btn" class="btn btn-primary">Subscribe</button>
+    <p class="fine-print">Billed by <strong>LoopSignal</strong>, the account behind DocDrifter — that's the name you'll see on the Paddle checkout and your card statement.</p>
     <p class="fine-print">Paddle checkout · cancel any time · <a href="/privacy">privacy</a> · <a href="/terms">terms</a></p>
   </div>
 </div>
