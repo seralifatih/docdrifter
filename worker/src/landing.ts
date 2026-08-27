@@ -257,11 +257,11 @@ section { padding: calc(2.2 * var(--leading)) 0; }
     <div class="install-grid">
       <div>
         <h2 style="font-size:28px;line-height:1.4">A few lines and it's watching</h2>
-        <p class="step-body" style="max-width:46ch">No setup UI required, no webhook to register. Commit the workflow, open your next PR, and see whether it stays quiet. <code class="inline">repo-description</code> is optional but not just decoration — a real one-liner about what your project does noticeably sharpens the model's judgment calls.</p>
+        <p class="step-body" style="max-width:46ch">Install DocDrifter Dashboard on your account or org to activate private repos, see a repo list, and manage billing in one place. Then commit the workflow below, open your next PR, and see whether it stays quiet. <code class="inline">repo-description</code> is optional but not just decoration — a real one-liner about what your project does noticeably sharpens the model's judgment calls.</p>
         <div style="display:flex;gap:12px;flex-wrap:wrap;margin-top:var(--leading)">
-          <a href="https://github.com/seralifatih/docdrifter" class="btn btn-primary">View on GitHub</a>
+          <a href="https://github.com/apps/docdrifter-dashboard/installations/new" class="btn btn-primary">Install DocDrifter Dashboard</a>
         </div>
-        <p style="font-size:13.5px;line-height:22px;margin:18px 0 0;color:var(--color-text-faint)">Have private repos, or want the dashboard? <a href="https://github.com/apps/docdrifter-dashboard/installations/new">Install DocDrifter Dashboard</a> instead — same Action underneath, plus billing and a repo list in one place.</p>
+        <p style="font-size:13.5px;line-height:22px;margin:18px 0 0;color:var(--color-text-faint)">Public repo, don't need the dashboard? <a href="https://github.com/seralifatih/docdrifter">View the Action on GitHub</a> and add just the workflow below.</p>
       </div>
       <pre class="card"><span style="color:var(--color-text-faint)"># .github/workflows/docdrifter.yml</span>
 name: DocDrifter
