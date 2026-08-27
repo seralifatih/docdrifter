@@ -35,7 +35,7 @@ import urllib.error
 import urllib.request
 
 MARKER = "<!-- docdrifter:comment -->"
-WORKER_URL = "https://docdrifter-api.h-f-ilhan.workers.dev/v1/evaluate"
+WORKER_URL = "https://docdrifter.com/v1/evaluate"
 OIDC_AUDIENCE = "docdrifter"
 
 SYSTEM_PROMPT_TEMPLATE = """You are a documentation-drift detector for a software \
