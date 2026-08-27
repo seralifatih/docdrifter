@@ -2,12 +2,19 @@ import {
   getSubscription,
   isLicensed,
   logRequest,
+  countRequestsThisMonth,
   getSession,
   getReposForUser,
   addToWaitlist,
   getInstallationForRepo,
   countPrivateRepos,
 } from "./db";
+
+// Fair-use caps (allowed=1 requests per repo per calendar month). Private
+// gets a higher ceiling since it's already paying; public gets a tighter
+// one since it's free revenue-wise and otherwise unbounded.
+const PRIVATE_MONTHLY_CAP = 100;
+const PUBLIC_MONTHLY_CAP = 50;
 import { verifyGithubOidcToken } from "./oidc";
 import { callDeepSeek } from "./deepseek";
 import { verifyPaddleSignature, handlePaddleEvent, createPortalSessionUrl } from "./paddle";
@@ -111,6 +118,25 @@ async function handleEvaluate(req: Request, env: Env): Promise<Response> {
         402
       );
     }
+  }
+
+  // Fair-use cap: billing is flat per repo, but cost is per-PR, so a quiet
+  // repo and a high-traffic monorepo currently pay the same price for very
+  // different DeepSeek spend. This caps the gap rather than eliminating it
+  // (a real per-usage price would be the fuller fix, but this is the cheap
+  // guard against the worst case -- one noisy repo eating an unbounded
+  // amount of margin, especially on the free/public tier).
+  const monthlyCap = body.is_private ? PRIVATE_MONTHLY_CAP : PUBLIC_MONTHLY_CAP;
+  const usedThisMonth = await countRequestsThisMonth(env.DB, repo);
+  if (usedThisMonth >= monthlyCap) {
+    await logRequest(env.DB, { repo, isPrivate: body.is_private, allowed: false });
+    return json(
+      {
+        error: "monthly_limit_reached",
+        message: `DocDrifter's fair-use limit for this repo (${monthlyCap} PR checks/month) has been reached. It resets at the start of next month.`,
+      },
+      429
+    );
   }
 
   await logRequest(env.DB, { repo, isPrivate: body.is_private, allowed: true });

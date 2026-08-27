@@ -97,7 +97,9 @@ export async function logRequest(
   db: D1Database,
   args: { repo: string; isPrivate: boolean; allowed: boolean }
 ): Promise<void> {
-  // Observability only -- never let this fail the request.
+  // Also the source of truth for the monthly fair-use cap below -- not
+  // purely observational anymore, but still best-effort: a failed insert
+  // here shouldn't fail the PR check itself.
   try {
     await db
       .prepare("INSERT INTO requests (repo, is_private, allowed) VALUES (?, ?, ?)")
@@ -106,6 +108,23 @@ export async function logRequest(
   } catch {
     // best-effort
   }
+}
+
+// How many LLM calls (allowed=1 requests -- the only ones that actually
+// cost money) has this repo made so far this calendar month. Used to cap
+// cost per repo, since billing is flat per-repo/per-installation but cost
+// is per-PR -- a quiet repo and a 400-PR/month monorepo pay the same price
+// today, so this is what keeps the gap from being unbounded.
+export async function countRequestsThisMonth(db: D1Database, repo: string): Promise<number> {
+  const row = await db
+    .prepare(
+      `SELECT COUNT(*) as n FROM requests
+       WHERE repo = ? AND allowed = 1
+         AND created_at >= strftime('%Y-%m-01T00:00:00', 'now')`
+    )
+    .bind(repo.toLowerCase())
+    .first<{ n: number }>();
+  return row?.n ?? 0;
 }
 
 // --- Accounts (GitHub App login + dashboard) ---

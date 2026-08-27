@@ -242,6 +242,7 @@ section { padding: calc(2.2 * var(--leading)) 0; }
       </div>
     </div>
     <p style="font-size:13.5px;line-height:22px;margin:var(--half) 0 0;color:var(--color-text-faint)">Billing is per GitHub installation, not per repo — install DocDrifter Dashboard once on your account or org, and one subscription's quantity tracks how many private repos it covers, at $9/repo/month flat. Add a private repo later and it's covered automatically; no separate subscription to set up for each one.</p>
+    <p style="font-size:13.5px;line-height:22px;margin:8px 0 0;color:var(--color-text-faint)">Fair use: 100 PR checks/month per private repo, 50 for public — plenty for almost everyone, and there if you ever need more. <a href="/terms">Details in the terms.</a></p>
   </section>
 
   <section id="install">
