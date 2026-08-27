@@ -63,41 +63,20 @@ function totalQuantity(items: { quantity: number }[] | undefined): number | unde
   return items.reduce((sum, item) => sum + item.quantity, 0);
 }
 
-// Bumps (or shrinks) the quantity on an already-active Paddle subscription,
-// so a newly-added private repo is covered immediately instead of waiting
-// for the customer to notice and update it manually. Paddle prorates the
-// difference onto the next invoice by default.
-export async function updateSubscriptionQuantity(
-  apiKey: string,
-  subscriptionId: string,
-  priceId: string,
-  quantity: number
-): Promise<boolean> {
-  try {
-    const resp = await fetch(`https://api.paddle.com/subscriptions/${subscriptionId}`, {
-      method: "PATCH",
-      headers: {
-        Authorization: `Bearer ${apiKey}`,
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({
-        items: [{ price_id: priceId, quantity }],
-        proration_billing_mode: "prorated_immediately",
-      }),
-    });
-    return resp.ok;
-  } catch {
-    return false;
-  }
+// Sandbox lives on a separate host with separate data -- an API key issued
+// for one environment is rejected by the other.
+function paddleApiBase(paddleEnv: string | undefined): string {
+  return paddleEnv === "sandbox" ? "https://sandbox-api.paddle.com" : "https://api.paddle.com";
 }
 
 export async function createPortalSessionUrl(
   apiKey: string,
   customerId: string,
-  subscriptionId: string | null
+  subscriptionId: string | null,
+  paddleEnv?: string
 ): Promise<string | null> {
   try {
-    const resp = await fetch(`https://api.paddle.com/customers/${customerId}/portal-sessions`, {
+    const resp = await fetch(`${paddleApiBase(paddleEnv)}/customers/${customerId}/portal-sessions`, {
       method: "POST",
       headers: {
         Authorization: `Bearer ${apiKey}`,

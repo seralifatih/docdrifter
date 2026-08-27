@@ -46,6 +46,9 @@ export interface Env {
   DEEPSEEK_API_KEY: string;
   PADDLE_WEBHOOK_SECRET: string;
   PADDLE_CLIENT_TOKEN: string;
+  // "sandbox" to exercise checkout with Paddle test cards; anything else
+  // (including unset) means real charges.
+  PADDLE_ENV?: string;
   PADDLE_PRICE_ID: string;
   PADDLE_API_KEY: string;
   CHECKOUT_BASE_URL: string; // e.g. "https://api.docdrifter.dev"
@@ -270,14 +273,13 @@ async function handleCheckoutPage(req: Request, env: Env): Promise<Response> {
     });
   }
 
-  const privateCount = await countPrivateRepos(env.DB, installation.installationId);
   const html = checkoutPage(
     repo,
     env.PADDLE_CLIENT_TOKEN,
     env.PADDLE_PRICE_ID,
     installation.installationId,
     installation.accountLogin,
-    privateCount
+    env.PADDLE_ENV === "sandbox" ? "sandbox" : "production"
   );
   return new Response(html, { headers: { "Content-Type": "text/html; charset=utf-8" } });
 }
@@ -329,7 +331,7 @@ async function handleStatusPage(req: Request, env: Env): Promise<Response> {
     ]);
     if (isRepoLicensed(sub, hasSeat) && sub) {
       const portalUrl = isOwner && sub.paddle_customer_id
-        ? await createPortalSessionUrl(env.PADDLE_API_KEY, sub.paddle_customer_id, sub.paddle_subscription_id)
+        ? await createPortalSessionUrl(env.PADDLE_API_KEY, sub.paddle_customer_id, sub.paddle_subscription_id, env.PADDLE_ENV)
         : null;
       html = statusPageActive(repo, sub, portalUrl, installation.accountLogin, isOwner);
     } else {

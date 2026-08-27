@@ -14,7 +14,10 @@ export function checkoutPage(
   priceId: string,
   installationId: number,
   accountLogin: string,
-  privateRepoCount: number
+  // "sandbox" routes Paddle.js at their test environment so the whole flow
+  // (checkout UI, webhook, seat assignment) can be exercised with test
+  // cards instead of real charges.
+  paddleEnv: "production" | "sandbox"
 ): string {
   const safeRepo = esc(repo);
   const safeAccount = esc(accountLogin);
@@ -51,6 +54,7 @@ p.lede { font-size: 14px; line-height: 21px; color: var(--color-text-muted); mar
 .qty-note { font-size: 13px; color: var(--color-text-muted); margin-top: 8px; }
 #checkout-btn { width: 100%; justify-content: center; margin-top: 22px; font-size: 15px; padding: 12px 18px; }
 .fine-print { font-size: 12.5px; color: var(--color-text-faint); margin-top: 14px; line-height: 18px; }
+.sandbox-banner { font-size: 12.5px; line-height: 18px; margin: 0 0 18px; padding: 8px 12px; border-radius: var(--radius-sm); background: color-mix(in srgb, #a56a00 14%, transparent); border: 1px solid color-mix(in srgb, #a56a00 40%, transparent); color: #a56a00; font-weight: 600; }
 .fine-print a { color: var(--color-accent-700); text-decoration: none; }
 .fine-print a:hover { text-decoration: underline; }
 </style>
@@ -62,6 +66,11 @@ p.lede { font-size: 14px; line-height: 21px; color: var(--color-text-muted); mar
     <span class="brand">DocDrifter</span>
   </div>
   <div class="panel card">
+    ${
+      paddleEnv === "sandbox"
+        ? `<p class="sandbox-banner">Sandbox mode — no real charge. Use test card 4242 4242 4242 4242.</p>`
+        : ""
+    }
     <span class="pill repo-pill">${LOCK_ICON} ${safeRepo}</span>
     <h1>Activate DocDrifter for this repo</h1>
     <p class="lede">You're activating <code>${safeRepo}</code> under the <strong>${safeAccount}</strong> installation. Public repos are always free and never need a seat.</p>
@@ -78,7 +87,7 @@ p.lede { font-size: 14px; line-height: 21px; color: var(--color-text-muted); mar
 </div>
 <script src="https://cdn.paddle.com/paddle/v2/paddle.js"></script>
 <script>
-Paddle.Environment.set("production");
+Paddle.Environment.set("${paddleEnv}");
 Paddle.Initialize({
   token: "${clientToken}",
   eventCallback: function (event) {
