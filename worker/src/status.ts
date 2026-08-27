@@ -149,9 +149,44 @@ export function statusPageNeedsActivation(
   checkoutUrl: string,
   priceAmount: string,
   priceUnit: string,
-  installationRequired: boolean
+  installationRequired: boolean,
+  justPaid = false
 ): string {
   const dateline = new Date().toLocaleDateString("en-GB", { day: "2-digit", month: "short", year: "numeric" });
+
+  // Paddle's webhook can take a few seconds to arrive after checkout
+  // redirects here, so a repo that was in fact just paid for can briefly
+  // still look unlicensed. Rather than show a dead "not activated" page and
+  // a "pay again" button, poll quietly until the seat shows up (or give up
+  // after a bit and let them refresh manually / contact support).
+  if (justPaid) {
+    const body = `
+  <div class="status-row">
+    <span class="dot" style="background:#a56a00;box-shadow:0 0 0 4px color-mix(in srgb, #a56a00 16%, transparent)"></span>
+    <span class="status-label" style="color:#a56a00" id="processing-label">Processing payment</span>
+    <span class="status-note">— this usually takes a few seconds</span>
+  </div>
+  <p class="lede">Payment went through — we're just waiting on confirmation before this repo shows as active. This page will refresh on its own.</p>
+  <script>
+  (function () {
+    var attempts = 0;
+    var maxAttempts = 10;
+    var poll = setInterval(function () {
+      attempts++;
+      fetch(window.location.pathname + "?repo=${encodeURIComponent(repo)}", { headers: { "X-Poll": "1" } })
+        .then(function (r) { return r.text(); })
+        .then(function (html) {
+          if (html.indexOf('Not activated') === -1 || attempts >= maxAttempts) {
+            clearInterval(poll);
+            window.location.href = "/status?repo=${encodeURIComponent(repo)}";
+          }
+        })
+        .catch(function () {});
+    }, 2500);
+  })();
+  </script>`;
+    return shell(repo, dateline, body);
+  }
 
   const cta = installationRequired
     ? `<div class="action-row">

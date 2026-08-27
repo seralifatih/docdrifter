@@ -92,7 +92,7 @@ Paddle.Initialize({
   token: "${clientToken}",
   eventCallback: function (event) {
     if (event.name === "checkout.completed") {
-      window.location.href = "/status?repo=" + encodeURIComponent("${safeRepo}");
+      window.location.href = "/status?repo=" + encodeURIComponent("${safeRepo}") + "&from=checkout";
     }
   }
 });

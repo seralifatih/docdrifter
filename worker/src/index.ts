@@ -290,6 +290,11 @@ async function handleStatusPage(req: Request, env: Env): Promise<Response> {
   if (!repo) {
     return new Response("Missing repo parameter", { status: 400 });
   }
+  // Paddle's webhook lands a few seconds after checkout redirects here, so
+  // this repo can still look "not activated" for a moment even though
+  // payment succeeded. ?from=checkout (set only by that redirect) tells the
+  // "not activated" branch to poll instead of showing a dead end.
+  const justPaid = url.searchParams.get("from") === "checkout";
 
   // Fully anonymous and takes a free-text repo param -- the one endpoint
   // here an attacker could script to enumerate repo names and check which
@@ -341,7 +346,7 @@ async function handleStatusPage(req: Request, env: Env): Promise<Response> {
       const checkoutUrl = needsSeatOnly
         ? `${env.CHECKOUT_BASE_URL}/dashboard`
         : `${env.CHECKOUT_BASE_URL}/checkout?repo=${encodeURIComponent(repo)}`;
-      html = statusPageNeedsActivation(repo, checkoutUrl, env.PRICE_AMOUNT || "$9", env.PRICE_UNIT || "per month", false);
+      html = statusPageNeedsActivation(repo, checkoutUrl, env.PRICE_AMOUNT || "$9", env.PRICE_UNIT || "per month", false, justPaid);
     }
   }
 
