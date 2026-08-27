@@ -1,5 +1,5 @@
 import type { SubscriptionRow } from "./db";
-import { BASE_STYLES, FAVICON_TAG } from "./styles";
+import { BASE_STYLES, FAVICON_TAG, THEME_INIT_SCRIPT } from "./styles";
 
 function esc(s: string): string {
   return s.replace(/[<>&"]/g, (c) => ({ "<": "&lt;", ">": "&gt;", "&": "&amp;", '"': "&quot;" }[c]!));
@@ -27,6 +27,7 @@ function shell(repo: string, dateline: string, body: string): string {
 <meta name="robots" content="noindex">
 <meta name="theme-color" content="#6b3fa0">
 ${FAVICON_TAG}
+${THEME_INIT_SCRIPT}
 <style>
 ${BASE_STYLES}
 body { display: flex; justify-content: center; padding: 40px 16px; }

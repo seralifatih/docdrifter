@@ -1,4 +1,4 @@
-import { BASE_STYLES, FAVICON_TAG } from "./styles";
+import { BASE_STYLES, FAVICON_TAG, THEME_INIT_SCRIPT } from "./styles";
 
 const DESCRIPTION = "A GitHub Action that flags pull requests which change code but leave documentation untouched. Free for public repos.";
 
@@ -20,14 +20,7 @@ ${FAVICON_TAG}
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="DocDrifter — docs that quietly stop being true">
 <meta name="twitter:description" content="${DESCRIPTION}">
-<script>
-(function () {
-  try {
-    var saved = localStorage.getItem("docdrifter-theme");
-    if (saved) document.documentElement.setAttribute("data-theme", saved);
-  } catch (e) {}
-})();
-</script>
+${THEME_INIT_SCRIPT}
 <style>
 ${BASE_STYLES}
 :root {

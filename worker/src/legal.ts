@@ -1,4 +1,4 @@
-import { BASE_STYLES, FAVICON_TAG } from "./styles";
+import { BASE_STYLES, FAVICON_TAG, THEME_INIT_SCRIPT } from "./styles";
 
 const BOOK_ICON = `<svg width="24" height="24" viewBox="0 0 32 32" fill="none" aria-hidden="true"><path d="M16 8.5C13 6 8.5 5.5 4 6v18c4.5-.5 9 0 12 2.5 3-2.5 7.5-3 12-2.5V6c-4.5-.5-9 0-12 2.5Z" fill="var(--brand)" opacity=".22"></path><path d="M16 8.5C13 6 8.5 5.5 4 6v18c4.5-.5 9 0 12 2.5 3-2.5 7.5-3 12-2.5V6c-4.5-.5-9 0-12 2.5Z" stroke="var(--brand)" stroke-width="1.6" stroke-linejoin="round"></path><path d="M16 8.5v20" stroke="var(--brand)" stroke-width="1.6"></path></svg>`;
 
@@ -11,6 +11,7 @@ function shell(title: string, active: "privacy" | "terms", body: string): string
 <title>DocDrifter — ${title}</title>
 <meta name="theme-color" content="#6b3fa0">
 ${FAVICON_TAG}
+${THEME_INIT_SCRIPT}
 <style>
 ${BASE_STYLES}
 body { display: flex; justify-content: center; padding: 40px 16px 80px; }
