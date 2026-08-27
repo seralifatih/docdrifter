@@ -1,5 +1,5 @@
 import type { SubscriptionRow } from "./db";
-import { BASE_STYLES } from "./styles";
+import { BASE_STYLES, FAVICON_TAG } from "./styles";
 
 function esc(s: string): string {
   return s.replace(/[<>&"]/g, (c) => ({ "<": "&lt;", ">": "&gt;", "&": "&amp;", '"': "&quot;" }[c]!));
@@ -88,11 +88,14 @@ export function dashboardPage(
        </div>`;
 
   return `<!doctype html>
-<html>
+<html lang="en">
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>DocDrifter — Dashboard</title>
+<meta name="robots" content="noindex">
+<meta name="theme-color" content="#6b3fa0">
+${FAVICON_TAG}
 <style>
 ${BASE_STYLES}
 body { min-height: 100vh; }

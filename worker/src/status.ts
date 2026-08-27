@@ -1,5 +1,5 @@
 import type { SubscriptionRow } from "./db";
-import { BASE_STYLES } from "./styles";
+import { BASE_STYLES, FAVICON_TAG } from "./styles";
 
 function esc(s: string): string {
   return s.replace(/[<>&"]/g, (c) => ({ "<": "&lt;", ">": "&gt;", "&": "&amp;", '"': "&quot;" }[c]!));
@@ -19,11 +19,14 @@ const LOCK_ICON = `<svg width="15" height="15" viewBox="0 0 16 16" fill="none" a
 function shell(repo: string, dateline: string, body: string): string {
   const [owner, name] = repo.split("/");
   return `<!doctype html>
-<html>
+<html lang="en">
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>DocDrifter — ${esc(repo)}</title>
+<meta name="robots" content="noindex">
+<meta name="theme-color" content="#6b3fa0">
+${FAVICON_TAG}
 <style>
 ${BASE_STYLES}
 body { display: flex; justify-content: center; padding: 40px 16px; }

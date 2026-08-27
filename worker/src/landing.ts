@@ -1,13 +1,25 @@
-import { BASE_STYLES } from "./styles";
+import { BASE_STYLES, FAVICON_TAG } from "./styles";
+
+const DESCRIPTION = "A GitHub Action that flags pull requests which change code but leave documentation untouched. Free for public repos.";
 
 export function landingPage(): string {
   return `<!doctype html>
-<html>
+<html lang="en">
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>DocDrifter — docs that quietly stop being true</title>
-<meta name="description" content="A GitHub Action that flags pull requests which change code but leave documentation untouched. Free for public repos.">
+<meta name="description" content="${DESCRIPTION}">
+<meta name="theme-color" content="#6b3fa0">
+${FAVICON_TAG}
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="DocDrifter">
+<meta property="og:title" content="DocDrifter — docs that quietly stop being true">
+<meta property="og:description" content="${DESCRIPTION}">
+<meta property="og:url" content="https://docdrifter.com/">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="DocDrifter — docs that quietly stop being true">
+<meta name="twitter:description" content="${DESCRIPTION}">
 <script>
 (function () {
   try {

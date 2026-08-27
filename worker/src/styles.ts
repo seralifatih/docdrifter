@@ -3,6 +3,12 @@
 // `prefers-color-scheme`. Component language (radius, cards, dot-grid) leans
 // on Railway; spacing/weight leans on Cal.com. See plan doc for rationale.
 
+// Same book mark used inline as BOOK_ICON across pages, as a self-contained
+// SVG data URI -- no static asset file, no extra request, works in every
+// tab regardless of theme (color is baked in, not var(--brand), since a
+// favicon renders outside the page's CSS context).
+export const FAVICON_TAG = `<link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='32' height='32' viewBox='0 0 32 32'%3E%3Cpath d='M16 8.5C13 6 8.5 5.5 4 6v18c4.5-.5 9 0 12 2.5 3-2.5 7.5-3 12-2.5V6c-4.5-.5-9 0-12 2.5Z' fill='%236b3fa0' opacity='.22'/%3E%3Cpath d='M16 8.5C13 6 8.5 5.5 4 6v18c4.5-.5 9 0 12 2.5 3-2.5 7.5-3 12-2.5V6c-4.5-.5-9 0-12 2.5Z' stroke='%236b3fa0' stroke-width='1.8' stroke-linejoin='round'/%3E%3Cpath d='M16 8.5v20' stroke='%236b3fa0' stroke-width='1.8'/%3E%3C/svg%3E">`;
+
 export const BASE_STYLES = `
 :root {
   --color-bg: #fafafa;
