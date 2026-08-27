@@ -193,6 +193,19 @@ export async function getReposForUser(db: D1Database, userId: number): Promise<U
   return result.results ?? [];
 }
 
+// Whether this user is the one who installed the given GitHub App
+// installation -- the only person allowed to open (or view billing details
+// on) a checkout for it. `installed_by_user_id` comes from the webhook's
+// `sender` field at install time, so this is GitHub-attested, not
+// self-reported.
+export async function userOwnsInstallation(db: D1Database, userId: number, installationId: number): Promise<boolean> {
+  const row = await db
+    .prepare("SELECT 1 FROM installations WHERE id = ? AND installed_by_user_id = ?")
+    .bind(installationId, userId)
+    .first();
+  return row !== null;
+}
+
 export async function addToWaitlist(db: D1Database, email: string): Promise<void> {
   await db.prepare("INSERT INTO waitlist (email) VALUES (?)").bind(email.trim().toLowerCase()).run();
 }

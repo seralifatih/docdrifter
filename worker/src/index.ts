@@ -8,6 +8,7 @@ import {
   addToWaitlist,
   getInstallationForRepo,
   countPrivateRepos,
+  userOwnsInstallation,
 } from "./db";
 
 // Fair-use caps (allowed=1 requests per repo per calendar month). Private
@@ -85,8 +86,16 @@ async function handleEvaluate(req: Request, env: Env): Promise<Response> {
   }
   const repo = trustedRepo;
 
-  if (body.is_private) {
-    const installation = await getInstallationForRepo(env.DB, repo);
+  // `body.is_private` is the client's own claim (the Action's local GitHub
+  // API call) -- never trust it for licensing or cap decisions, since a
+  // caller with a valid OIDC token for their own private repo could just
+  // send `is_private: false` to skip the license check and get the looser
+  // public cap. The installation_repos row (populated by GitHub's own
+  // installation webhook) is the actual source of truth.
+  const installation = await getInstallationForRepo(env.DB, repo);
+  const isPrivate = installation ? installation.isPrivate : body.is_private;
+
+  if (isPrivate) {
     if (!installation) {
       // Private repos must have the GitHub App installed -- that's how we
       // know which installation (and therefore which subscription) covers
@@ -128,10 +137,10 @@ async function handleEvaluate(req: Request, env: Env): Promise<Response> {
   // (a real per-usage price would be the fuller fix, but this is the cheap
   // guard against the worst case -- one noisy repo eating an unbounded
   // amount of margin, especially on the free/public tier).
-  const monthlyCap = body.is_private ? PRIVATE_MONTHLY_CAP : PUBLIC_MONTHLY_CAP;
+  const monthlyCap = isPrivate ? PRIVATE_MONTHLY_CAP : PUBLIC_MONTHLY_CAP;
   const usedThisMonth = await countRequestsThisMonth(env.DB, repo);
   if (usedThisMonth >= monthlyCap) {
-    await logRequest(env.DB, { repo, isPrivate: body.is_private, allowed: false });
+    await logRequest(env.DB, { repo, isPrivate, allowed: false });
     return json(
       {
         error: "monthly_limit_reached",
@@ -141,7 +150,7 @@ async function handleEvaluate(req: Request, env: Env): Promise<Response> {
     );
   }
 
-  await logRequest(env.DB, { repo, isPrivate: body.is_private, allowed: true });
+  await logRequest(env.DB, { repo, isPrivate, allowed: true });
 
   try {
     const verdict = await callDeepSeek(env.DEEPSEEK_API_KEY, body.system_prompt, body.user_prompt);
@@ -178,6 +187,19 @@ async function handleCheckoutPage(req: Request, env: Env): Promise<Response> {
   if (!repo) {
     return new Response("Missing repo parameter", { status: 400 });
   }
+
+  // Checkout shows and acts on billing details for a whole installation
+  // (private repo count, account login, and opens a Paddle checkout bound
+  // to that installation_id) -- only the person who installed the App
+  // should see or trigger that, so this requires a session, unlike
+  // /status which is linked from PR comments and must stay anonymous.
+  const loginUrl = `/auth/github/login?redirect=${encodeURIComponent(url.pathname + url.search)}`;
+  const sessionId = getSessionCookieValue(req);
+  const session = sessionId ? await getSession(env.DB, sessionId) : null;
+  if (!session) {
+    return new Response(null, { status: 302, headers: { Location: loginUrl } });
+  }
+
   const installation = await getInstallationForRepo(env.DB, repo);
   if (!installation) {
     return new Response(null, {
@@ -185,6 +207,11 @@ async function handleCheckoutPage(req: Request, env: Env): Promise<Response> {
       headers: { Location: `/status?repo=${encodeURIComponent(repo)}` },
     });
   }
+  const owns = await userOwnsInstallation(env.DB, session.userId, installation.installationId);
+  if (!owns) {
+    return new Response("You don't have access to manage this repo's subscription.", { status: 403 });
+  }
+
   const privateCount = await countPrivateRepos(env.DB, installation.installationId);
   const html = checkoutPage(
     repo,
@@ -206,6 +233,19 @@ async function handleStatusPage(req: Request, env: Env): Promise<Response> {
 
   const installation = await getInstallationForRepo(env.DB, repo);
 
+  // /status is linked from PR comments, so it's intentionally reachable
+  // without a session -- but anyone with a valid session can be checked
+  // against the installation's owner, and only the owner gets to see
+  // account login, renewal date, plan quantity, or a "manage subscription"
+  // link. Anonymous or non-owner visitors get the status badge and nothing
+  // billing-identifying beyond that.
+  let isOwner = false;
+  if (installation) {
+    const sessionId = getSessionCookieValue(req);
+    const session = sessionId ? await getSession(env.DB, sessionId) : null;
+    isOwner = session ? await userOwnsInstallation(env.DB, session.userId, installation.installationId) : false;
+  }
+
   let html: string;
   if (!installation) {
     // App isn't installed on this repo at all. We can't tell public/private
@@ -220,10 +260,10 @@ async function handleStatusPage(req: Request, env: Env): Promise<Response> {
     const sub = await getSubscription(env.DB, installation.installationId);
     const privateCount = await countPrivateRepos(env.DB, installation.installationId);
     if (isLicensed(sub, privateCount) && sub) {
-      const portalUrl = sub.paddle_customer_id
+      const portalUrl = isOwner && sub.paddle_customer_id
         ? await createPortalSessionUrl(env.PADDLE_API_KEY, sub.paddle_customer_id, sub.paddle_subscription_id)
         : null;
-      html = statusPageActive(repo, sub, portalUrl, installation.accountLogin);
+      html = statusPageActive(repo, sub, portalUrl, installation.accountLogin, isOwner);
     } else {
       const checkoutUrl = `${env.CHECKOUT_BASE_URL}/checkout?repo=${encodeURIComponent(repo)}`;
       html = statusPageNeedsActivation(repo, checkoutUrl, env.PRICE_AMOUNT || "$9", env.PRICE_UNIT || "per month", false);
@@ -334,7 +374,7 @@ export default {
         return await handleStatusPage(req, env);
       }
       if (req.method === "GET" && url.pathname === "/auth/github/login") {
-        return await handleGithubLogin(env);
+        return await handleGithubLogin(req, env);
       }
       if (req.method === "GET" && url.pathname === "/auth/github/callback") {
         return await handleGithubCallback(req, env);

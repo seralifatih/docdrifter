@@ -90,16 +90,13 @@ export function statusPageActive(
   repo: string,
   row: SubscriptionRow,
   portalUrl: string | null,
-  accountLogin: string
+  accountLogin: string,
+  isOwner: boolean
 ): string {
   const dateline = new Date().toLocaleDateString("en-GB", { day: "2-digit", month: "short", year: "numeric" });
   const underQuota = row.status === "active" && row.quantity < 1;
   const statColor = row.status === "past_due" ? "#a56a00" : underQuota ? "#a56a00" : "#1a7f4e";
   const statLabel = row.status === "past_due" ? "Past due" : underQuota ? "Plan under quota" : "Active";
-
-  const manageButton = portalUrl
-    ? `<a class="btn btn-primary" href="${esc(portalUrl)}">Manage subscription</a><span class="action-note">Opens Paddle — invoices, card, cancellation.</span>`
-    : `<span class="action-note">Manage this subscription from the receipt emailed by Paddle at checkout.</span>`;
 
   const statusNote = row.status === "past_due"
     ? "payment needs attention"
@@ -107,18 +104,32 @@ export function statusPageActive(
       ? "plan quantity doesn't cover every private repo in this installation"
       : "subscription in good standing";
 
+  // Account login, renewal date, plan quantity, and the Paddle portal link
+  // are only for the installation's owner -- this page is reachable by
+  // anyone with the repo name (it's linked from PR comments), so a
+  // non-owner or anonymous visitor only gets the status badge above.
+  const details = isOwner
+    ? `
+  <div class="grid">
+    <div><div class="field-label">Next renewal</div><div class="field-value">${formatDate(row.current_period_end)}</div></div>
+    <div><div class="field-label">Plan covers</div><div class="field-value">${row.quantity} repo${row.quantity === 1 ? "" : "s"}</div></div>
+  </div>
+  <p class="lede">This subscription covers every private repo under the <strong>${esc(accountLogin)}</strong> GitHub installation, not just this one. Manage it once from the dashboard instead of per repo.</p>
+  <div class="action-row">${
+    portalUrl
+      ? `<a class="btn btn-primary" href="${esc(portalUrl)}">Manage subscription</a><span class="action-note">Opens Paddle — invoices, card, cancellation.</span>`
+      : `<span class="action-note">Manage this subscription from the receipt emailed by Paddle at checkout.</span>`
+  }<a class="btn btn-secondary" href="/dashboard">View all repos</a></div>`
+    : `
+  <p class="lede">This repo is licensed. <a href="/dashboard">Sign in</a> if you manage this installation and want to see renewal and billing details.</p>`;
+
   const body = `
   <div class="status-row">
     <span class="dot" style="background:${statColor};box-shadow:0 0 0 4px color-mix(in srgb, ${statColor} 16%, transparent)"></span>
     <span class="status-label" style="color:${statColor}">${statLabel}</span>
     <span class="status-note">— ${statusNote}</span>
   </div>
-  <div class="grid">
-    <div><div class="field-label">Next renewal</div><div class="field-value">${formatDate(row.current_period_end)}</div></div>
-    <div><div class="field-label">Plan covers</div><div class="field-value">${row.quantity} repo${row.quantity === 1 ? "" : "s"}</div></div>
-  </div>
-  <p class="lede">This subscription covers every private repo under the <strong>${esc(accountLogin)}</strong> GitHub installation, not just this one. Manage it once from the dashboard instead of per repo.</p>
-  <div class="action-row">${manageButton}<a class="btn btn-secondary" href="/dashboard">View all repos</a></div>`;
+  ${details}`;
 
   return shell(repo, dateline, body);
 }

@@ -3,6 +3,7 @@ import { timingSafeEqualHex, computeHmac } from "./crypto";
 
 const SESSION_COOKIE = "docdrifter_session";
 const STATE_COOKIE = "docdrifter_oauth_state";
+const REDIRECT_COOKIE = "docdrifter_oauth_redirect";
 const SESSION_MAX_AGE_SECONDS = 30 * 24 * 60 * 60; // 30 days
 
 export function getCookie(req: Request, name: string): string | null {
@@ -35,11 +36,21 @@ async function verifyState(cookieValue: string, queryState: string, secret: stri
   return state === queryState;
 }
 
-export async function handleGithubLogin(env: {
-  GITHUB_APP_CLIENT_ID: string;
-  STATE_SECRET: string;
-  CHECKOUT_BASE_URL: string;
-}): Promise<Response> {
+// Only same-site relative paths are allowed as a post-login redirect target
+// -- never a full URL, which would make this an open redirect via a
+// crafted /auth/github/login?redirect= link.
+function isSafeRedirectPath(path: string): boolean {
+  return path.startsWith("/") && !path.startsWith("//") && !path.includes("://");
+}
+
+export async function handleGithubLogin(
+  req: Request,
+  env: {
+    GITHUB_APP_CLIENT_ID: string;
+    STATE_SECRET: string;
+    CHECKOUT_BASE_URL: string;
+  }
+): Promise<Response> {
   const state = randomToken(24);
   const signed = await signState(state, env.STATE_SECRET);
   const redirectUri = `${env.CHECKOUT_BASE_URL}/auth/github/callback`;
@@ -53,6 +64,14 @@ export async function handleGithubLogin(env: {
     "Set-Cookie",
     `${STATE_COOKIE}=${signed}; HttpOnly; Secure; SameSite=Lax; Path=/auth/github; Max-Age=600`
   );
+
+  const requestedRedirect = new URL(req.url).searchParams.get("redirect");
+  if (requestedRedirect && isSafeRedirectPath(requestedRedirect)) {
+    headers.append(
+      "Set-Cookie",
+      `${REDIRECT_COOKIE}=${encodeURIComponent(requestedRedirect)}; HttpOnly; Secure; SameSite=Lax; Path=/auth/github; Max-Age=600`
+    );
+  }
   return new Response(null, { status: 302, headers });
 }
 
@@ -116,13 +135,17 @@ export async function handleGithubCallback(
   const expiresAt = new Date(Date.now() + SESSION_MAX_AGE_SECONDS * 1000).toISOString();
   await createSession(env.DB, { sessionId, userId: user.id, expiresAt });
 
+  const savedRedirect = getCookie(req, REDIRECT_COOKIE);
+  const destination = savedRedirect && isSafeRedirectPath(savedRedirect) ? savedRedirect : "/dashboard";
+
   const headers = new Headers();
-  headers.set("Location", "/dashboard");
+  headers.set("Location", destination);
   headers.append(
     "Set-Cookie",
     `${SESSION_COOKIE}=${sessionId}; HttpOnly; Secure; SameSite=Lax; Path=/; Max-Age=${SESSION_MAX_AGE_SECONDS}`
   );
   headers.append("Set-Cookie", `${STATE_COOKIE}=; HttpOnly; Secure; SameSite=Lax; Path=/auth/github; Max-Age=0`);
+  headers.append("Set-Cookie", `${REDIRECT_COOKIE}=; HttpOnly; Secure; SameSite=Lax; Path=/auth/github; Max-Age=0`);
   return new Response(null, { status: 302, headers });
 }
 
