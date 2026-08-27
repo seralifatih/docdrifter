@@ -1,4 +1,4 @@
-import { getRepo, isPaid, logRequest } from "./db";
+import { getRepo, isPaid, logRequest, getSession, getReposForUser } from "./db";
 import { verifyGithubOidcToken } from "./oidc";
 import { callDeepSeek } from "./deepseek";
 import { verifyPaddleSignature, handlePaddleEvent, createPortalSessionUrl } from "./paddle";
@@ -6,6 +6,8 @@ import { checkoutPage } from "./checkout";
 import { statusPageActive, statusPageNeedsActivation } from "./status";
 import { landingPage } from "./landing";
 import { verifyGithubWebhookSignature, handleGithubWebhookEvent } from "./githubApp";
+import { handleGithubLogin, handleGithubCallback, handleLogout, getSessionCookieValue } from "./auth";
+import { dashboardPage } from "./dashboard";
 
 export interface Env {
   DB: D1Database;
@@ -165,6 +167,34 @@ async function handleGithubWebhook(req: Request, env: Env): Promise<Response> {
   }
 }
 
+const INSTALL_URL = "https://github.com/apps/docdrifter-dashboard/installations/new";
+
+async function handleDashboardPage(req: Request, env: Env): Promise<Response> {
+  const sessionId = getSessionCookieValue(req);
+  if (!sessionId) {
+    return new Response(null, { status: 302, headers: { Location: "/auth/github/login" } });
+  }
+  const session = await getSession(env.DB, sessionId);
+  if (!session) {
+    return new Response(null, { status: 302, headers: { Location: "/auth/github/login" } });
+  }
+
+  const repoSlugs = await getReposForUser(env.DB, session.userId);
+  const repos = await Promise.all(
+    repoSlugs.map(async (repo) => ({ repo, row: await getRepo(env.DB, repo) }))
+  );
+
+  // login/avatar aren't stored on the session row -- look them up once via
+  // the users table so the dashboard header can greet the right person.
+  const user = await env.DB
+    .prepare("SELECT login, avatar_url FROM users WHERE github_id = ?")
+    .bind(session.userId)
+    .first<{ login: string; avatar_url: string | null }>();
+
+  const html = dashboardPage(user?.login ?? "there", user?.avatar_url ?? null, repos, INSTALL_URL);
+  return new Response(html, { headers: { "Content-Type": "text/html; charset=utf-8" } });
+}
+
 export default {
   async fetch(req: Request, env: Env): Promise<Response> {
     try {
@@ -184,6 +214,18 @@ export default {
       }
       if (req.method === "GET" && url.pathname === "/status") {
         return await handleStatusPage(req, env);
+      }
+      if (req.method === "GET" && url.pathname === "/auth/github/login") {
+        return await handleGithubLogin(env);
+      }
+      if (req.method === "GET" && url.pathname === "/auth/github/callback") {
+        return await handleGithubCallback(req, env);
+      }
+      if (req.method === "POST" && url.pathname === "/auth/logout") {
+        return await handleLogout(req, env);
+      }
+      if (req.method === "GET" && url.pathname === "/dashboard") {
+        return await handleDashboardPage(req, env);
       }
       if (req.method === "GET" && url.pathname === "/") {
         return new Response(landingPage(), { headers: { "Content-Type": "text/html; charset=utf-8" } });
