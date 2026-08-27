@@ -9,6 +9,8 @@ import {
   getInstallationForRepo,
   countPrivateRepos,
   userOwnsInstallation,
+  pruneExpiredSessions,
+  pruneOldRequests,
 } from "./db";
 
 // Fair-use caps (allowed=1 requests per repo per calendar month). Private
@@ -43,6 +45,24 @@ export interface Env {
   GITHUB_APP_CLIENT_SECRET: string;
   GITHUB_WEBHOOK_SECRET: string;
   STATE_SECRET: string;
+  PUBLIC_RATE_LIMITER: RateLimit;
+}
+
+// True (allowed) on a rate-limiter failure -- if Cloudflare's rate limiting
+// service itself is unavailable, that should never be the reason a real
+// visitor gets blocked from a page. This is a defense against abuse, not a
+// dependency the app should go down with.
+async function checkRateLimit(limiter: RateLimit, key: string): Promise<boolean> {
+  try {
+    const { success } = await limiter.limit({ key });
+    return success;
+  } catch {
+    return true;
+  }
+}
+
+function clientIp(req: Request): string {
+  return req.headers.get("CF-Connecting-IP") ?? "unknown";
 }
 
 function json(body: unknown, status = 200): Response {
@@ -163,6 +183,9 @@ async function handleEvaluate(req: Request, env: Env): Promise<Response> {
 const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
 async function handleWaitlist(req: Request, env: Env): Promise<Response> {
+  if (!(await checkRateLimit(env.PUBLIC_RATE_LIMITER, `waitlist:${clientIp(req)}`))) {
+    return json({ error: "rate_limited" }, 429);
+  }
   let body: { email?: string };
   try {
     body = await req.json();
@@ -200,6 +223,10 @@ async function handleCheckoutPage(req: Request, env: Env): Promise<Response> {
     return new Response(null, { status: 302, headers: { Location: loginUrl } });
   }
 
+  if (!(await checkRateLimit(env.PUBLIC_RATE_LIMITER, `checkout:${clientIp(req)}`))) {
+    return new Response("Too many requests, try again shortly.", { status: 429 });
+  }
+
   const installation = await getInstallationForRepo(env.DB, repo);
   if (!installation) {
     return new Response(null, {
@@ -229,6 +256,14 @@ async function handleStatusPage(req: Request, env: Env): Promise<Response> {
   const repo = url.searchParams.get("repo") ?? "";
   if (!repo) {
     return new Response("Missing repo parameter", { status: 400 });
+  }
+
+  // Fully anonymous and takes a free-text repo param -- the one endpoint
+  // here an attacker could script to enumerate repo names and check which
+  // ones have the App installed, so it gets the rate limit even though the
+  // response itself no longer leaks anything beyond a status badge.
+  if (!(await checkRateLimit(env.PUBLIC_RATE_LIMITER, `status:${clientIp(req)}`))) {
+    return new Response("Too many requests, try again shortly.", { status: 429 });
   }
 
   const installation = await getInstallationForRepo(env.DB, repo);
@@ -414,5 +449,13 @@ export default {
       console.error("Unhandled error:", err);
       return json({ error: "internal_error" }, 500);
     }
+  },
+
+  async scheduled(_controller: ScheduledController, env: Env): Promise<void> {
+    const [sessionsDeleted, requestsDeleted] = await Promise.all([
+      pruneExpiredSessions(env.DB),
+      pruneOldRequests(env.DB),
+    ]);
+    console.log(`Daily cleanup: ${sessionsDeleted} expired sessions, ${requestsDeleted} old request logs deleted.`);
   },
 };

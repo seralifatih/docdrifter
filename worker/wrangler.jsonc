@@ -14,6 +14,15 @@
       "database_id": "d1fd42f5-8fbb-4e9a-a814-599280a764b4"
     }
   ],
+  "ratelimits": [
+    // Native platform rate limiting, no D1 round-trip. Simple counting
+    // algorithm: at most `limit` requests per `period` seconds, per key
+    // (we pass the caller's IP as the key at call time). One binding is
+    // reused across /waitlist, /checkout, and /status since they're all
+    // "low-frequency human actions," not something that legitimately
+    // needs a different threshold from each other.
+    { "name": "PUBLIC_RATE_LIMITER", "namespace_id": "1001", "simple": { "limit": 20, "period": 60 } }
+  ],
   "vars": {
     // Non-secret config. PADDLE_CLIENT_TOKEN is client-exposed by design
     // (it's embedded in the checkout page's Paddle.js call), so it lives
@@ -28,5 +37,10 @@
   },
   "observability": {
     "enabled": true
+  },
+  "triggers": {
+    // Once a day: prune expired sessions and old request logs. Neither
+    // table had any retention before this -- both grew forever.
+    "crons": ["17 3 * * *"]
   }
 }

@@ -127,6 +127,21 @@ export async function countRequestsThisMonth(db: D1Database, repo: string): Prom
   return row?.n ?? 0;
 }
 
+// Daily cleanup (called from the scheduled handler). Neither table had
+// retention before: expired sessions were filtered on read but never
+// deleted, and `requests` grew forever even though only the current
+// calendar month is ever queried (the fair-use cap above). 60 days of
+// slack covers the cap query plus any debugging that looks a month back.
+export async function pruneExpiredSessions(db: D1Database): Promise<number> {
+  const result = await db.prepare("DELETE FROM sessions WHERE expires_at < datetime('now')").run();
+  return result.meta.changes ?? 0;
+}
+
+export async function pruneOldRequests(db: D1Database): Promise<number> {
+  const result = await db.prepare("DELETE FROM requests WHERE created_at < datetime('now', '-60 days')").run();
+  return result.meta.changes ?? 0;
+}
+
 // --- Accounts (GitHub App login + dashboard) ---
 
 export interface UserRow {
@@ -207,7 +222,9 @@ export async function userOwnsInstallation(db: D1Database, userId: number, insta
 }
 
 export async function addToWaitlist(db: D1Database, email: string): Promise<void> {
-  await db.prepare("INSERT INTO waitlist (email) VALUES (?)").bind(email.trim().toLowerCase()).run();
+  // OR IGNORE against the unique index on email -- a repeat signup (or a
+  // script retrying the same address) is a silent no-op, not an error.
+  await db.prepare("INSERT OR IGNORE INTO waitlist (email) VALUES (?)").bind(email.trim().toLowerCase()).run();
 }
 
 export interface RepoInstallation {

@@ -3,6 +3,12 @@ export interface DriftVerdict {
   reason: string;
 }
 
+// Without this, a hung upstream call blocks the request until the platform
+// kills it -- one slow DeepSeek incident would degrade every PR check
+// waiting on this fetch instead of failing fast and letting the Action's
+// own catch-all treat it as "backend call failed, skip this run."
+const DEEPSEEK_TIMEOUT_MS = 25_000;
+
 export async function callDeepSeek(
   apiKey: string,
   systemPrompt: string,
@@ -22,6 +28,7 @@ export async function callDeepSeek(
       ],
       temperature: 0,
     }),
+    signal: AbortSignal.timeout(DEEPSEEK_TIMEOUT_MS),
   });
 
   if (!resp.ok) {
