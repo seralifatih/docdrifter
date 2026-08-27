@@ -23,6 +23,11 @@ diff-aware LLM approach in `scripts/llm_pipeline.py` gets:
 | apiflask, 2 labels corrected (n=44) | 77.3% | 100% |
 | pygeoapi, raw labels (n=48) | 84.6% | 91.7% |
 
+That's **68–85% precision, 92–100% recall** across two repos — not a
+uniform number, and apiflask stays the weaker repo even after correction
+(77.3% vs pygeoapi's 84.6%). apiflask's 17 of 44 PRs were real drift, so the
+100% recall isn't a fluke of a tiny positive class.
+
 This was **not** a blind eval — the prompt went through a few iterations
 against this same labeled set before settling on what ships today. Along the
 way, a manual re-read of apiflask's false positives found two PRs we'd

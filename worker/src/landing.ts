@@ -159,6 +159,7 @@ section { padding: calc(2.2 * var(--leading)) 0; }
     <div class="evidence-grid">
       <div>
         <h2 class="evidence-title">Hand-labeled against 92 real pull requests</h2>
+        <p class="evidence-body" style="font-size:16px;font-weight:600;color:var(--color-text)">68–85% precision, 92–100% recall, across two repos. Not one repo above the other — apiflask lands lower than pygeoapi even after correction.</p>
         <p class="evidence-body">We pulled 92 merged PRs from two open-source projects (apiflask, pygeoapi), read each one, and recorded whether documentation genuinely needed an update — then ran DocDrifter against the same set. This was not a blind eval: the prompt went through a few iterations against this same labeled set before we settled on the version shipping today. Along the way we also found two labeling misses of our own on apiflask — PRs we'd marked "no drift" that a manual re-read confirmed were real drift, mislabeled before the model ever saw them. We're showing both the raw numbers (original labels) and the corrected numbers (after fixing those two), so you can judge either one. Nothing is held back — the labels, the prompt history, and every run are in <a href="https://github.com/seralifatih/docdrifter/tree/master/data" target="_blank" rel="noopener">the repository</a>.</p>
       </div>
       <div>
@@ -190,7 +191,7 @@ section { padding: calc(2.2 * var(--leading)) 0; }
           </tbody>
         </table>
         </div>
-        <p style="font-size:13px;line-height:20px;margin:12px 0 0;color:var(--color-text-faint)">n=44 (apiflask), n=48 (pygeoapi). pygeoapi's ground truth was never revised — only apiflask had labels we caught and fixed.</p>
+        <p style="font-size:13px;line-height:20px;margin:12px 0 0;color:var(--color-text-faint)">apiflask: 17 of 44 PRs were real drift, corrected precision 77.3% is below pygeoapi's — we're not claiming a uniform 85%+ across both repos, apiflask is the weaker of the two. pygeoapi's ground truth was never revised — only apiflask had labels we caught and fixed.</p>
         <div style="margin-top: var(--leading)">
           <div class="stat-label" style="margin-bottom: var(--half)">Precision vs. the obvious baseline (apiflask, corrected)</div>
           <div class="bar-row">
