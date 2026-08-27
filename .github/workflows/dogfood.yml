@@ -14,8 +14,8 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-      - uses: ./action
+      - uses: ./
         with:
-          src-path: "action/"
+          src-path: "worker/src/"
           docs-path: "docs-site/"
           repo-description: "DocDrifter, a GitHub bot that flags PRs changing source code without updating docs"

@@ -37,7 +37,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-      - uses: seralifatih/docdrifter/action@v1
+      - uses: seralifatih/docdrifter@v1
         with:
           src-path: "src/"
           docs-path: "docs/"
