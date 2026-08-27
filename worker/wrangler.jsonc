@@ -12,10 +12,16 @@
     }
   ],
   "vars": {
-    // Non-secret config. Secrets (DEEPSEEK_API_KEY, PADDLE_WEBHOOK_SECRET,
-    // PADDLE_CLIENT_TOKEN) are set via `wrangler secret put`, not here.
+    // Non-secret config. PADDLE_CLIENT_TOKEN is client-exposed by design
+    // (it's embedded in the checkout page's Paddle.js call), so it lives
+    // here too rather than as a Worker secret. PADDLE_WEBHOOK_SECRET is
+    // set via `wrangler secret put`, not here.
     "CHECKOUT_BASE_URL": "https://docdrifter-api.h-f-ilhan.workers.dev",
-    "PADDLE_PRICE_ID": "pri_REPLACE_ME"
+    "PADDLE_PRICE_ID": "pri_01m0zv1fn8rsj6xhgjxydxavqd",
+    "PADDLE_CLIENT_TOKEN": "live_1b3d2879563153f1ce6576b5189",
+    "PRICE_LABEL": "Single repo — $9 / month",
+    "PRICE_AMOUNT": "$9",
+    "PRICE_UNIT": "per month\nper private repo"
   },
   "observability": {
     "enabled": true

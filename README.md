@@ -51,6 +51,11 @@ required. **Free for public repos.** Private repos need an active
 subscription; if yours isn't licensed yet, DocDrifter will comment on your
 next PR with a link to activate it.
 
+Check a repo's subscription status anytime at
+`https://docdrifter-api.h-f-ilhan.workers.dev/status?repo=owner/name` — it
+shows whether the repo is licensed, the next renewal date, and a link to
+Paddle's customer portal for invoices, card updates, and cancellation.
+
 ## Status
 
 Early prototype, not yet published to the GitHub Marketplace. Currently

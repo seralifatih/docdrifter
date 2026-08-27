@@ -1,8 +1,9 @@
 import { getRepo, isPaid, logRequest } from "./db";
 import { verifyGithubOidcToken } from "./oidc";
 import { callDeepSeek } from "./deepseek";
-import { verifyPaddleSignature, handlePaddleEvent } from "./paddle";
+import { verifyPaddleSignature, handlePaddleEvent, createPortalSessionUrl } from "./paddle";
 import { checkoutPage } from "./checkout";
+import { statusPageActive, statusPageNeedsActivation } from "./status";
 
 export interface Env {
   DB: D1Database;
@@ -10,7 +11,11 @@ export interface Env {
   PADDLE_WEBHOOK_SECRET: string;
   PADDLE_CLIENT_TOKEN: string;
   PADDLE_PRICE_ID: string;
+  PADDLE_API_KEY: string;
   CHECKOUT_BASE_URL: string; // e.g. "https://api.docdrifter.dev"
+  PRICE_LABEL: string; // e.g. "Single repo — $9 / month"
+  PRICE_AMOUNT: string; // e.g. "$9"
+  PRICE_UNIT: string; // e.g. "per month\nper private repo"
 }
 
 function json(body: unknown, status = 200): Response {
@@ -91,6 +96,29 @@ async function handleCheckoutPage(req: Request, env: Env): Promise<Response> {
   return new Response(html, { headers: { "Content-Type": "text/html; charset=utf-8" } });
 }
 
+async function handleStatusPage(req: Request, env: Env): Promise<Response> {
+  const url = new URL(req.url);
+  const repo = url.searchParams.get("repo") ?? "";
+  if (!repo) {
+    return new Response("Missing repo parameter", { status: 400 });
+  }
+
+  const row = await getRepo(env.DB, repo);
+
+  let html: string;
+  if (isPaid(row) && row) {
+    const portalUrl = row.paddle_customer_id
+      ? await createPortalSessionUrl(env.PADDLE_API_KEY, row.paddle_customer_id, row.paddle_subscription_id)
+      : null;
+    html = statusPageActive(repo, row, portalUrl, env.PRICE_LABEL || "Single repo — subscription");
+  } else {
+    const checkoutUrl = `${env.CHECKOUT_BASE_URL}/checkout?repo=${encodeURIComponent(repo)}`;
+    html = statusPageNeedsActivation(repo, checkoutUrl, env.PRICE_AMOUNT || "$9", env.PRICE_UNIT || "per month");
+  }
+
+  return new Response(html, { headers: { "Content-Type": "text/html; charset=utf-8" } });
+}
+
 async function handlePaddleWebhook(req: Request, env: Env): Promise<Response> {
   const raw = await req.text();
   const valid = await verifyPaddleSignature(
@@ -124,6 +152,9 @@ export default {
       }
       if (req.method === "GET" && url.pathname === "/checkout") {
         return await handleCheckoutPage(req, env);
+      }
+      if (req.method === "GET" && url.pathname === "/status") {
+        return await handleStatusPage(req, env);
       }
 
       return new Response("Not found", { status: 404 });

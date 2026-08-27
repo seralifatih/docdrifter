@@ -18,7 +18,14 @@ export function checkoutPage(repo: string, clientToken: string, priceId: string)
 <script src="https://cdn.paddle.com/paddle/v2/paddle.js"></script>
 <script>
   Paddle.Environment.set("production");
-  Paddle.Initialize({ token: "${clientToken}" });
+  Paddle.Initialize({
+    token: "${clientToken}",
+    eventCallback: function (event) {
+      if (event.name === "checkout.completed") {
+        window.location.href = "/status?repo=" + encodeURIComponent("${safeRepo}");
+      }
+    }
+  });
   document.getElementById("checkout-btn").addEventListener("click", function () {
     Paddle.Checkout.open({
       items: [{ priceId: "${priceId}", quantity: 1 }],

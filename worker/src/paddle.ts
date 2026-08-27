@@ -76,6 +76,30 @@ interface PaddleEvent {
   };
 }
 
+export async function createPortalSessionUrl(
+  apiKey: string,
+  customerId: string,
+  subscriptionId: string | null
+): Promise<string | null> {
+  try {
+    const resp = await fetch(`https://api.paddle.com/customers/${customerId}/portal-sessions`, {
+      method: "POST",
+      headers: {
+        Authorization: `Bearer ${apiKey}`,
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify(
+        subscriptionId ? { subscription_ids: [subscriptionId] } : {}
+      ),
+    });
+    if (!resp.ok) return null;
+    const result = await resp.json<{ data: { urls: { general: { overview: string } } } }>();
+    return result.data.urls.general.overview;
+  } catch {
+    return null;
+  }
+}
+
 export async function handlePaddleEvent(db: D1Database, raw: string): Promise<void> {
   const event = JSON.parse(raw) as PaddleEvent;
   const data = event.data;
