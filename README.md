@@ -78,6 +78,16 @@ Check a repo's subscription status anytime at
 is licensed, the next renewal date, and a link to Paddle's customer portal
 for invoices, card updates, and cancellation.
 
+## Data and privacy
+
+Each PR sends only its diff and title to DocDrifter's backend, which
+forwards them to DeepSeek for evaluation — nothing else in the repo is read.
+DocDrifter's own database does not store your diff or code, only the repo
+name, its public/private status, and whether the request was allowed. Full
+details, including what the dashboard's GitHub login stores and how Paddle
+billing works, are at [docdrifter.com/privacy](https://docdrifter.com/privacy)
+and [docdrifter.com/terms](https://docdrifter.com/terms).
+
 ## Status
 
 Running in production, not yet listed on the GitHub Marketplace. Install it
