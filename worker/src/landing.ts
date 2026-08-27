@@ -238,18 +238,18 @@ section { padding: calc(2.2 * var(--leading)) 0; }
           <span class="price-num">$9</span>
           <span style="font-family:var(--mono);font-size:14px;color:var(--color-text-muted)">/ repo / month</span>
         </div>
-        <p style="font-size:14px;line-height:22px;margin:10px 0 0;color:var(--color-text-muted);font-family:var(--mono)">one subscription per GitHub install, billed per private repo</p>
+        <p style="font-size:14px;line-height:22px;margin:10px 0 0;color:var(--color-text-muted);font-family:var(--mono)">one seat per private repo, start with just one</p>
         <div class="feature-list">
           <div class="feature-item"><span class="dot-mark">·</span><span>Everything in the free tier</span></div>
-          <div class="feature-item"><span class="dot-mark">·</span><span>One subscription covers every private repo in your account or org</span></div>
-          <div class="feature-item"><span class="dot-mark">·</span><span>New repo added later gets covered automatically</span></div>
+          <div class="feature-item"><span class="dot-mark">·</span><span>Pay only for the private repos you actually activate</span></div>
+          <div class="feature-item"><span class="dot-mark">·</span><span>Move a seat to a different repo any time, no extra charge</span></div>
           <div class="feature-item"><span class="dot-mark">·</span><span>Dashboard to manage every repo in one place</span></div>
           <div class="feature-item"><span class="dot-mark">·</span><span>Custom docs/source paths and skip labels</span></div>
         </div>
         <a href="#install" class="btn btn-secondary" style="margin-top:var(--leading)">Start on a private repo</a>
       </div>
     </div>
-    <p style="font-size:13.5px;line-height:22px;margin:var(--half) 0 0;color:var(--color-text-faint)">Billing is per GitHub installation, not per repo — install DocDrifter Dashboard once on your account or org, and one subscription's quantity tracks how many private repos it covers, at $9/repo/month flat. Add a private repo later and it's covered automatically; no separate subscription to set up for each one.</p>
+    <p style="font-size:13.5px;line-height:22px;margin:var(--half) 0 0;color:var(--color-text-faint)">Each private repo you activate takes one $9/month seat. Having 30 private repos doesn't mean paying for 30 — activate one, or ten, and add more when you want them. Seats aren't tied to a specific repo: free one up and point it somewhere else whenever you like. Public repos never need a seat.</p>
     <p style="font-size:13.5px;line-height:22px;margin:8px 0 0;color:var(--color-text-faint)">Fair use: 100 PR checks/month per private repo, 50 for public — plenty for almost everyone, and there if you ever need more. <a href="/terms">Details in the terms.</a></p>
   </section>
 

@@ -1,6 +1,13 @@
 import {
   getSubscription,
-  isLicensed,
+  isRepoLicensed,
+  isSubscriptionActive,
+  isRepoSeated,
+  countSeatsUsed,
+  getSeatedRepos,
+  claimSeat,
+  releaseSeat,
+  trimSeatsToQuantity,
   logRequest,
   countRequestsThisMonth,
   getSession,
@@ -135,19 +142,25 @@ async function handleEvaluate(req: Request, env: Env): Promise<Response> {
       );
     }
 
-    const [sub, privateCount] = await Promise.all([
+    const [sub, hasSeat] = await Promise.all([
       getSubscription(env.DB, installation.installationId),
-      countPrivateRepos(env.DB, installation.installationId),
+      isRepoSeated(env.DB, installation.installationId, repo),
     ]);
-    if (!isLicensed(sub, privateCount)) {
+    if (!isRepoLicensed(sub, hasSeat)) {
       await logRequest(env.DB, { repo, isPrivate: true, allowed: false });
       const checkoutUrl = `${env.CHECKOUT_BASE_URL}/checkout?repo=${encodeURIComponent(repo)}`;
+      // Distinguish "you have no subscription" from "you have one, but this
+      // particular repo doesn't hold a seat" -- the second is fixable from
+      // the dashboard without paying again, so saying "not licensed" flatly
+      // would send a paying customer to checkout for no reason.
+      const seatedButUnlicensed = isSubscriptionActive(sub) && !hasSeat;
       return json(
         {
-          error: "repo_not_licensed",
-          message:
-            "DocDrifter is free for public repos. This repo is private and needs an active subscription covering its installation.",
-          checkout_url: checkoutUrl,
+          error: seatedButUnlicensed ? "repo_not_activated" : "repo_not_licensed",
+          message: seatedButUnlicensed
+            ? "This private repo isn't one of the repos your DocDrifter subscription covers. Activate it from the dashboard, or add a seat if you're at your limit."
+            : "DocDrifter is free for public repos. This repo is private and needs an active subscription.",
+          checkout_url: seatedButUnlicensed ? `${env.CHECKOUT_BASE_URL}/dashboard` : checkoutUrl,
         },
         402
       );
@@ -242,6 +255,21 @@ async function handleCheckoutPage(req: Request, env: Env): Promise<Response> {
     return new Response("You don't have access to manage this repo's subscription.", { status: 403 });
   }
 
+  // Someone with an active subscription and a spare seat shouldn't be sent
+  // to Paddle at all -- just claim the seat and send them to the repo's
+  // status page. Only a genuine capacity shortfall needs a payment.
+  const [existingSub, seatsUsed] = await Promise.all([
+    getSubscription(env.DB, installation.installationId),
+    countSeatsUsed(env.DB, installation.installationId),
+  ]);
+  if (isSubscriptionActive(existingSub) && existingSub && seatsUsed < existingSub.quantity) {
+    await claimSeat(env.DB, installation.installationId, repo);
+    return new Response(null, {
+      status: 302,
+      headers: { Location: `/status?repo=${encodeURIComponent(repo)}` },
+    });
+  }
+
   const privateCount = await countPrivateRepos(env.DB, installation.installationId);
   const html = checkoutPage(
     repo,
@@ -295,15 +323,22 @@ async function handleStatusPage(req: Request, env: Env): Promise<Response> {
   } else if (!installation.isPrivate) {
     html = statusPageFree(repo);
   } else {
-    const sub = await getSubscription(env.DB, installation.installationId);
-    const privateCount = await countPrivateRepos(env.DB, installation.installationId);
-    if (isLicensed(sub, privateCount) && sub) {
+    const [sub, hasSeat] = await Promise.all([
+      getSubscription(env.DB, installation.installationId),
+      isRepoSeated(env.DB, installation.installationId, repo),
+    ]);
+    if (isRepoLicensed(sub, hasSeat) && sub) {
       const portalUrl = isOwner && sub.paddle_customer_id
         ? await createPortalSessionUrl(env.PADDLE_API_KEY, sub.paddle_customer_id, sub.paddle_subscription_id)
         : null;
       html = statusPageActive(repo, sub, portalUrl, installation.accountLogin, isOwner);
     } else {
-      const checkoutUrl = `${env.CHECKOUT_BASE_URL}/checkout?repo=${encodeURIComponent(repo)}`;
+      // An active subscription that just doesn't cover this repo yet is a
+      // dashboard trip, not a second purchase.
+      const needsSeatOnly = isSubscriptionActive(sub);
+      const checkoutUrl = needsSeatOnly
+        ? `${env.CHECKOUT_BASE_URL}/dashboard`
+        : `${env.CHECKOUT_BASE_URL}/checkout?repo=${encodeURIComponent(repo)}`;
       html = statusPageNeedsActivation(repo, checkoutUrl, env.PRICE_AMOUNT || "$9", env.PRICE_UNIT || "per month", false);
     }
   }
@@ -370,12 +405,24 @@ async function handleDashboardPage(req: Request, env: Env): Promise<Response> {
       installationIds.map(async (id) => [id, await getSubscription(env.DB, id)] as const)
     )
   );
+  const seatsByInstallation = new Map(
+    await Promise.all(
+      installationIds.map(async (id) => [id, new Set(await getSeatedRepos(env.DB, id))] as const)
+    )
+  );
   const repos = userRepos.map((r) => ({
     repo: r.repo,
     isPrivate: r.is_private === 1,
     installationId: r.installation_id,
     subscription: subsByInstallation.get(r.installation_id) ?? null,
+    hasSeat: seatsByInstallation.get(r.installation_id)?.has(r.repo) ?? false,
   }));
+  const seatUsage = new Map(
+    installationIds.map((id) => [
+      id,
+      { used: seatsByInstallation.get(id)?.size ?? 0, total: subsByInstallation.get(id)?.quantity ?? 0 },
+    ])
+  );
 
   // login/avatar aren't stored on the session row -- look them up once via
   // the users table so the dashboard header can greet the right person.
@@ -384,8 +431,60 @@ async function handleDashboardPage(req: Request, env: Env): Promise<Response> {
     .bind(session.userId)
     .first<{ login: string; avatar_url: string | null }>();
 
-  const html = dashboardPage(user?.login ?? "there", user?.avatar_url ?? null, repos, INSTALL_URL);
+  const html = dashboardPage(user?.login ?? "there", user?.avatar_url ?? null, repos, INSTALL_URL, seatUsage);
   return new Response(html, { headers: { "Content-Type": "text/html; charset=utf-8" } });
+}
+
+// Assign or free a seat from the dashboard. Only moves seats already paid
+// for -- claiming past the plan's quantity is refused rather than silently
+// upgrading someone's bill.
+async function handleSeatChange(req: Request, env: Env): Promise<Response> {
+  const sessionId = getSessionCookieValue(req);
+  const session = sessionId ? await getSession(env.DB, sessionId) : null;
+  if (!session) {
+    return json({ error: "not_authenticated" }, 401);
+  }
+
+  let body: { repo?: string; action?: string };
+  try {
+    body = await req.json();
+  } catch {
+    return json({ error: "invalid_request" }, 400);
+  }
+  const repo = (body.repo ?? "").trim().toLowerCase();
+  const action = body.action;
+  if (!repo || (action !== "claim" && action !== "release")) {
+    return json({ error: "invalid_request" }, 400);
+  }
+
+  const installation = await getInstallationForRepo(env.DB, repo);
+  if (!installation) {
+    return json({ error: "repo_not_found" }, 404);
+  }
+  if (!(await userOwnsInstallation(env.DB, session.userId, installation.installationId))) {
+    return json({ error: "forbidden" }, 403);
+  }
+  if (!installation.isPrivate) {
+    return json({ error: "public_repos_are_free" }, 400);
+  }
+
+  if (action === "release") {
+    await releaseSeat(env.DB, installation.installationId, repo);
+    return json({ ok: true }, 200);
+  }
+
+  const [sub, seatsUsed] = await Promise.all([
+    getSubscription(env.DB, installation.installationId),
+    countSeatsUsed(env.DB, installation.installationId),
+  ]);
+  if (!isSubscriptionActive(sub) || !sub) {
+    return json({ error: "no_active_subscription" }, 402);
+  }
+  if (seatsUsed >= sub.quantity) {
+    return json({ error: "no_seats_available" }, 409);
+  }
+  await claimSeat(env.DB, installation.installationId, repo);
+  return json({ ok: true }, 200);
 }
 
 export default {
@@ -419,6 +518,9 @@ export default {
       }
       if (req.method === "POST" && url.pathname === "/auth/logout") {
         return await handleLogout(req, env);
+      }
+      if (req.method === "POST" && url.pathname === "/dashboard/seat") {
+        return await handleSeatChange(req, env);
       }
       if (req.method === "GET" && url.pathname === "/dashboard") {
         return await handleDashboardPage(req, env);

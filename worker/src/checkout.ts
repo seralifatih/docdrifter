@@ -18,7 +18,11 @@ export function checkoutPage(
 ): string {
   const safeRepo = esc(repo);
   const safeAccount = esc(accountLogin);
-  const qty = Math.max(privateRepoCount, 1);
+  // Default to a single seat -- the repo the user actually came here for.
+  // Paddle's own checkout has a quantity stepper if they want more, and
+  // extra seats can also be claimed later from the dashboard for free
+  // until the plan is full.
+  const qty = 1;
 
   return `<!doctype html>
 <html lang="en">
@@ -58,15 +62,15 @@ p.lede { font-size: 14px; line-height: 21px; color: var(--color-text-muted); mar
     <span class="brand">DocDrifter</span>
   </div>
   <div class="panel card">
-    <span class="pill repo-pill">${LOCK_ICON} ${safeAccount}</span>
-    <h1>Activate DocDrifter for ${safeAccount}</h1>
-    <p class="lede">This subscription covers every private repo under this GitHub installation — not just <code>${safeRepo}</code>. Public repos stay free and don't count toward the total.</p>
+    <span class="pill repo-pill">${LOCK_ICON} ${safeRepo}</span>
+    <h1>Activate DocDrifter for this repo</h1>
+    <p class="lede">You're activating <code>${safeRepo}</code> under the <strong>${safeAccount}</strong> installation. Public repos are always free and never need a seat.</p>
     <div class="divider"></div>
     <div class="price-row">
-      <span class="price">$${qty * 9}</span>
-      <span class="price-unit">/ month<br>$9 × ${qty} private repo${qty === 1 ? "" : "s"}</span>
+      <span class="price">$9</span>
+      <span class="price-unit">/ month<br>per private repo</span>
     </div>
-    <p class="qty-note">Adding a private repo later updates this automatically — no need to come back and re-subscribe.</p>
+    <p class="qty-note">Need more than one? Use the quantity stepper on the next screen — spare seats can be assigned to other private repos from your dashboard, no extra checkout.</p>
     <button id="checkout-btn" class="btn btn-primary">Subscribe</button>
     <p class="fine-print">Paddle checkout · cancel any time · <a href="/privacy">privacy</a> · <a href="/terms">terms</a></p>
   </div>
@@ -85,7 +89,10 @@ Paddle.Initialize({
 document.getElementById("checkout-btn").addEventListener("click", function () {
   Paddle.Checkout.open({
     items: [{ priceId: "${priceId}", quantity: ${qty} }],
-    customData: { installation_id: ${installationId} }
+    // repo travels with the payment so the webhook can give this exact
+    // repo the first seat -- otherwise someone could pay and still find
+    // the repo they came for unlicensed.
+    customData: { installation_id: ${installationId}, repo: "${safeRepo}" }
   });
 });
 </script>

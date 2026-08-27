@@ -93,16 +93,12 @@ export function statusPageActive(
   accountLogin: string,
   isOwner: boolean
 ): string {
+  // Only called for a repo that actually holds a seat, so the only
+  // remaining distinction is whether the plan's payment is healthy.
   const dateline = new Date().toLocaleDateString("en-GB", { day: "2-digit", month: "short", year: "numeric" });
-  const underQuota = row.status === "active" && row.quantity < 1;
-  const statColor = row.status === "past_due" ? "#a56a00" : underQuota ? "#a56a00" : "#1a7f4e";
-  const statLabel = row.status === "past_due" ? "Past due" : underQuota ? "Plan under quota" : "Active";
-
-  const statusNote = row.status === "past_due"
-    ? "payment needs attention"
-    : underQuota
-      ? "plan quantity doesn't cover every private repo in this installation"
-      : "subscription in good standing";
+  const statColor = row.status === "past_due" ? "#a56a00" : "#1a7f4e";
+  const statLabel = row.status === "past_due" ? "Past due" : "Active";
+  const statusNote = row.status === "past_due" ? "payment needs attention" : "subscription in good standing";
 
   // Account login, renewal date, plan quantity, and the Paddle portal link
   // are only for the installation's owner -- this page is reachable by
@@ -112,9 +108,9 @@ export function statusPageActive(
     ? `
   <div class="grid">
     <div><div class="field-label">Next renewal</div><div class="field-value">${formatDate(row.current_period_end)}</div></div>
-    <div><div class="field-label">Plan covers</div><div class="field-value">${row.quantity} repo${row.quantity === 1 ? "" : "s"}</div></div>
+    <div><div class="field-label">Plan size</div><div class="field-value">${row.quantity} seat${row.quantity === 1 ? "" : "s"}</div></div>
   </div>
-  <p class="lede">This subscription covers every private repo under the <strong>${esc(accountLogin)}</strong> GitHub installation, not just this one. Manage it once from the dashboard instead of per repo.</p>
+  <p class="lede">This repo holds one of the seats on the <strong>${esc(accountLogin)}</strong> installation's plan. Seats can be moved between private repos from the dashboard at no extra cost.</p>
   <div class="action-row">${
     portalUrl
       ? `<a class="btn btn-primary" href="${esc(portalUrl)}">Manage subscription</a><span class="action-note">Opens Paddle — invoices, card, cancellation.</span>`
@@ -163,8 +159,8 @@ export function statusPageNeedsActivation(
         <span class="action-note">Private repos need the GitHub App installed before they can be licensed — one install covers your whole account or org.</span>
       </div>`
     : `<div class="action-row">
-        <a class="btn btn-primary" href="${esc(checkoutUrl)}">Activate this installation</a>
-        <span class="action-note">Paddle checkout. One subscription covers every private repo you've installed DocDrifter on. Cancel any time.</span>
+        <a class="btn btn-primary" href="${esc(checkoutUrl)}">Activate this repo</a>
+        <span class="action-note">Paddle checkout. One seat covers this repo; seats can be moved between private repos later. Cancel any time.</span>
       </div>`;
 
   const body = `
@@ -174,7 +170,7 @@ export function statusPageNeedsActivation(
     <span class="status-note">— the action exits and skips its checks</span>
   </div>
   <h2>Activate DocDrifter for this repo</h2>
-  <p class="lede">Every PR gets its docs read against the diff, and drifted pages come back as a review comment. Private repos need an active subscription on their GitHub installation; public ones don't.</p>
+  <p class="lede">Every PR gets its docs read against the diff, and drifted pages come back as a review comment. Each private repo takes one seat on your plan; public repos are always free.</p>
   <div class="price-row">
     <span class="price">${esc(priceAmount)}</span>
     <span class="price-note">${esc(priceUnit)}</span>

@@ -1,4 +1,10 @@
-import { upsertSubscriptionByPaddleId, type SubscriptionStatus } from "./db";
+import {
+  upsertSubscriptionByPaddleId,
+  getSubscriptionByPaddleId,
+  claimSeat,
+  trimSeatsToQuantity,
+  type SubscriptionStatus,
+} from "./db";
 import { timingSafeEqualHex, computeHmac } from "./crypto";
 
 function mapPaddleStatus(paddleStatus: string): SubscriptionStatus {
@@ -46,7 +52,7 @@ interface PaddleEvent {
     customer_id?: string;
     subscription_id?: string; // present on transaction.* events
     status?: string;
-    custom_data?: { installation_id?: number } | null;
+    custom_data?: { installation_id?: number; repo?: string } | null;
     current_billing_period?: { ends_at?: string } | null;
     items?: { quantity: number }[]; // present on subscription.* events
   };
@@ -128,6 +134,12 @@ export async function handlePaddleEvent(db: D1Database, raw: string): Promise<vo
         quantity: totalQuantity(data.items),
         currentPeriodEnd: data.current_billing_period?.ends_at ?? null,
       });
+      // Give the repo they checked out for the first seat, so the page they
+      // land back on actually shows it as active.
+      const repo = data.custom_data?.repo;
+      if (repo) {
+        await claimSeat(db, installationId, repo);
+      }
       return;
     }
 
@@ -140,6 +152,16 @@ export async function handlePaddleEvent(db: D1Database, raw: string): Promise<vo
         quantity: totalQuantity(data.items),
         currentPeriodEnd: data.current_billing_period?.ends_at ?? null,
       });
+      // If the plan shrank (downgrade, or cancellation zeroing it out),
+      // seats have to shrink with it or we'd keep licensing repos that
+      // are no longer paid for.
+      const newQuantity = totalQuantity(data.items);
+      if (newQuantity !== undefined) {
+        const sub = await getSubscriptionByPaddleId(db, data.id);
+        if (sub) {
+          await trimSeatsToQuantity(db, sub.installation_id, newQuantity);
+        }
+      }
       return;
     }
 

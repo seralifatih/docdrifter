@@ -11,12 +11,19 @@ export interface SubscriptionRow {
 
 const PAID_STATUSES: SubscriptionStatus[] = ["active", "past_due"];
 
-// A subscription only actually licenses a repo if it's both in a paid
-// status AND its quantity covers the installation's current private repo
-// count -- a lapsed top-up (repo added, quantity never bumped) should not
-// silently license everything under it.
-export function isLicensed(row: SubscriptionRow | null, privateRepoCount: number): boolean {
-  return row !== null && PAID_STATUSES.includes(row.status) && row.quantity >= privateRepoCount;
+// Whether the subscription itself is payable-and-current. Says nothing about
+// which repos it covers -- see isRepoLicensed for that.
+export function isSubscriptionActive(row: SubscriptionRow | null): boolean {
+  return row !== null && PAID_STATUSES.includes(row.status);
+}
+
+// A private repo is licensed only if its installation has a paid
+// subscription AND that repo explicitly holds one of the seats (a
+// licensed_repos row). Seats are claimed at checkout, not inferred from
+// the installation's repo count -- otherwise someone with 31 private repos
+// could never license just one of them.
+export function isRepoLicensed(row: SubscriptionRow | null, hasSeat: boolean): boolean {
+  return isSubscriptionActive(row) && hasSeat;
 }
 
 export async function getSubscription(db: D1Database, installationId: number): Promise<SubscriptionRow | null> {
@@ -25,6 +32,21 @@ export async function getSubscription(db: D1Database, installationId: number): P
       "SELECT installation_id, status, quantity, paddle_customer_id, paddle_subscription_id, current_period_end FROM subscriptions WHERE installation_id = ?"
     )
     .bind(installationId)
+    .first<SubscriptionRow>();
+  return row ?? null;
+}
+
+// Paddle webhooks identify a subscription by its own id, not ours -- needed
+// to find which installation a quantity change applies to.
+export async function getSubscriptionByPaddleId(
+  db: D1Database,
+  paddleSubscriptionId: string
+): Promise<SubscriptionRow | null> {
+  const row = await db
+    .prepare(
+      "SELECT installation_id, status, quantity, paddle_customer_id, paddle_subscription_id, current_period_end FROM subscriptions WHERE paddle_subscription_id = ?"
+    )
+    .bind(paddleSubscriptionId)
     .first<SubscriptionRow>();
   return row ?? null;
 }
@@ -280,4 +302,64 @@ export async function countPrivateRepos(db: D1Database, installationId: number):
     .bind(installationId)
     .first<{ n: number }>();
   return row?.n ?? 0;
+}
+
+// --- Seats (which private repos a subscription actually covers) ---
+
+export async function isRepoSeated(db: D1Database, installationId: number, repo: string): Promise<boolean> {
+  const row = await db
+    .prepare("SELECT 1 FROM licensed_repos WHERE installation_id = ? AND repo = ?")
+    .bind(installationId, repo.toLowerCase())
+    .first();
+  return row !== null;
+}
+
+export async function countSeatsUsed(db: D1Database, installationId: number): Promise<number> {
+  const row = await db
+    .prepare("SELECT COUNT(*) as n FROM licensed_repos WHERE installation_id = ?")
+    .bind(installationId)
+    .first<{ n: number }>();
+  return row?.n ?? 0;
+}
+
+export async function getSeatedRepos(db: D1Database, installationId: number): Promise<string[]> {
+  const result = await db
+    .prepare("SELECT repo FROM licensed_repos WHERE installation_id = ? ORDER BY created_at")
+    .bind(installationId)
+    .all<{ repo: string }>();
+  return (result.results ?? []).map((r) => r.repo);
+}
+
+export async function claimSeat(db: D1Database, installationId: number, repo: string): Promise<void> {
+  await db
+    .prepare("INSERT OR IGNORE INTO licensed_repos (installation_id, repo) VALUES (?, ?)")
+    .bind(installationId, repo.toLowerCase())
+    .run();
+}
+
+export async function releaseSeat(db: D1Database, installationId: number, repo: string): Promise<void> {
+  await db
+    .prepare("DELETE FROM licensed_repos WHERE installation_id = ? AND repo = ?")
+    .bind(installationId, repo.toLowerCase())
+    .run();
+}
+
+// When a subscription shrinks (quantity lowered in Paddle, or cancelled),
+// drop the newest seats until usage fits. Oldest seats win, so the repo
+// someone first paid for isn't the one silently dropped.
+export async function trimSeatsToQuantity(db: D1Database, installationId: number, quantity: number): Promise<number> {
+  const result = await db
+    .prepare(
+      `DELETE FROM licensed_repos
+       WHERE installation_id = ?1
+         AND repo NOT IN (
+           SELECT repo FROM licensed_repos
+           WHERE installation_id = ?1
+           ORDER BY created_at
+           LIMIT ?2
+         )`
+    )
+    .bind(installationId, Math.max(quantity, 0))
+    .run();
+  return result.meta.changes ?? 0;
 }
