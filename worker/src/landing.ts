@@ -261,6 +261,7 @@ section { padding: calc(2.2 * var(--leading)) 0; }
         <div style="display:flex;gap:12px;flex-wrap:wrap;margin-top:var(--leading)">
           <a href="https://github.com/seralifatih/docdrifter" class="btn btn-primary">View on GitHub</a>
         </div>
+        <p style="font-size:13.5px;line-height:22px;margin:18px 0 0;color:var(--color-text-faint)">Have private repos, or want the dashboard? <a href="https://github.com/apps/docdrifter-dashboard/installations/new">Install DocDrifter Dashboard</a> instead — same Action underneath, plus billing and a repo list in one place.</p>
       </div>
       <pre class="card"><span style="color:var(--color-text-faint)"># .github/workflows/docdrifter.yml</span>
 name: DocDrifter
