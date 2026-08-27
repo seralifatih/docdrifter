@@ -149,6 +149,10 @@ export async function getReposForUser(db: D1Database, userId: number): Promise<U
   return result.results ?? [];
 }
 
+export async function addToWaitlist(db: D1Database, email: string): Promise<void> {
+  await db.prepare("INSERT INTO waitlist (email) VALUES (?)").bind(email.trim().toLowerCase()).run();
+}
+
 // Best-effort: is this repo known to be private from GitHub App install
 // data? Returns null if we've never seen it via an installation webhook
 // (e.g. the App isn't installed on it) -- callers should treat null as

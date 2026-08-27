@@ -12,12 +12,29 @@ and leaves a comment only when it thinks the docs actually need an update.
 
 ## Validation
 
-Before building this, the detection approach was validated against 90+ real
+Before building this, the detection approach was validated against 92 real
 merged PRs from two open-source projects (apiflask, pygeoapi), with manually
 labeled ground truth. A naive title-keyword heuristic got 42% precision. The
-diff-aware LLM approach in `scripts/llm_pipeline.py` gets 85%+ precision and
-90%+ recall on both repos. The full methodology, prompt iteration history,
-and raw results are in [`data/`](data/).
+diff-aware LLM approach in `scripts/llm_pipeline.py` gets:
+
+| Repo | Precision | Recall |
+| --- | --- | --- |
+| apiflask, raw labels (n=44) | 68.2% | 100% |
+| apiflask, 2 labels corrected (n=44) | 77.3% | 100% |
+| pygeoapi, raw labels (n=48) | 84.6% | 91.7% |
+
+This was **not** a blind eval — the prompt went through a few iterations
+against this same labeled set before settling on what ships today. Along the
+way, a manual re-read of apiflask's false positives found two PRs we'd
+originally labeled "no drift" that were, on closer look, real drift the
+model had actually caught correctly. We corrected those two labels and
+re-scored; the row above shows both the original and corrected numbers so
+you can judge either one. No other label was touched after seeing model
+output, and pygeoapi's ground truth was never revised. The correction is
+noted inline in [`data/dataset.json`](data/dataset.json). The full
+methodology, prompt iteration history, and raw results (including the
+false-positive review notes) are in [`data/`](data/) — nothing is held
+back.
 
 ## Usage
 
@@ -58,6 +75,9 @@ for invoices, card updates, and cancellation.
 
 ## Status
 
-Early prototype, not yet published to the GitHub Marketplace. Currently
-tested via [`.github/workflows/dogfood.yml`](.github/workflows/dogfood.yml),
-which runs this repo's own action against its own PRs.
+Running in production, not yet listed on the GitHub Marketplace. Install it
+today by pointing `uses:` at `seralifatih/docdrifter@v1` in your workflow
+(see Usage above) — no Marketplace listing is required to use the action.
+This repo dogfoods itself via
+[`.github/workflows/dogfood.yml`](.github/workflows/dogfood.yml), and it's
+also running on a handful of external repos today.

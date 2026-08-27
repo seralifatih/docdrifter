@@ -1,10 +1,11 @@
-import { getRepo, isPaid, logRequest, getSession, getReposForUser, isRepoPrivate } from "./db";
+import { getRepo, isPaid, logRequest, getSession, getReposForUser, isRepoPrivate, addToWaitlist } from "./db";
 import { verifyGithubOidcToken } from "./oidc";
 import { callDeepSeek } from "./deepseek";
 import { verifyPaddleSignature, handlePaddleEvent, createPortalSessionUrl } from "./paddle";
 import { checkoutPage } from "./checkout";
 import { statusPageActive, statusPageNeedsActivation, statusPageFree } from "./status";
 import { landingPage } from "./landing";
+import { privacyPage, termsPage } from "./legal";
 import { verifyGithubWebhookSignature, handleGithubWebhookEvent } from "./githubApp";
 import { handleGithubLogin, handleGithubCallback, handleLogout, getSessionCookieValue } from "./auth";
 import { dashboardPage } from "./dashboard";
@@ -92,6 +93,27 @@ async function handleEvaluate(req: Request, env: Env): Promise<Response> {
   } catch (err) {
     return json({ error: "evaluation_failed" }, 502);
   }
+}
+
+const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+
+async function handleWaitlist(req: Request, env: Env): Promise<Response> {
+  let body: { email?: string };
+  try {
+    body = await req.json();
+  } catch {
+    return json({ error: "invalid_request" }, 400);
+  }
+  const email = (body.email ?? "").trim();
+  if (!EMAIL_RE.test(email) || email.length > 320) {
+    return json({ error: "invalid_email" }, 400);
+  }
+  try {
+    await addToWaitlist(env.DB, email);
+  } catch (err) {
+    return json({ error: "storage_failed" }, 500);
+  }
+  return json({ ok: true }, 200);
 }
 
 async function handleCheckoutPage(req: Request, env: Env): Promise<Response> {
@@ -214,6 +236,9 @@ export default {
       if (req.method === "POST" && url.pathname === "/v1/evaluate") {
         return await handleEvaluate(req, env);
       }
+      if (req.method === "POST" && url.pathname === "/waitlist") {
+        return await handleWaitlist(req, env);
+      }
       if (req.method === "POST" && url.pathname === "/v1/webhook/paddle") {
         return await handlePaddleWebhook(req, env);
       }
@@ -240,6 +265,12 @@ export default {
       }
       if (req.method === "GET" && url.pathname === "/") {
         return new Response(landingPage(), { headers: { "Content-Type": "text/html; charset=utf-8" } });
+      }
+      if (req.method === "GET" && url.pathname === "/privacy") {
+        return new Response(privacyPage(), { headers: { "Content-Type": "text/html; charset=utf-8" } });
+      }
+      if (req.method === "GET" && url.pathname === "/terms") {
+        return new Response(termsPage(), { headers: { "Content-Type": "text/html; charset=utf-8" } });
       }
 
       return new Response("Not found", { status: 404 });

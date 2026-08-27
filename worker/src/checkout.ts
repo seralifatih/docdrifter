@@ -1,37 +1,79 @@
+import { BASE_STYLES } from "./styles";
+
+function esc(s: string): string {
+  return s.replace(/[<>&"]/g, (c) => ({ "<": "&lt;", ">": "&gt;", "&": "&amp;", '"': "&quot;" }[c]!));
+}
+
+const BOOK_ICON = `<svg width="24" height="24" viewBox="0 0 32 32" fill="none" aria-hidden="true"><path d="M16 8.5C13 6 8.5 5.5 4 6v18c4.5-.5 9 0 12 2.5 3-2.5 7.5-3 12-2.5V6c-4.5-.5-9 0-12 2.5Z" fill="var(--brand)" opacity=".22"></path><path d="M16 8.5C13 6 8.5 5.5 4 6v18c4.5-.5 9 0 12 2.5 3-2.5 7.5-3 12-2.5V6c-4.5-.5-9 0-12 2.5Z" stroke="var(--brand)" stroke-width="1.6" stroke-linejoin="round"></path><path d="M16 8.5v20" stroke="var(--brand)" stroke-width="1.6"></path></svg>`;
+
+const LOCK_ICON = `<svg width="14" height="14" viewBox="0 0 16 16" fill="none" aria-hidden="true"><rect x="2.5" y="7" width="11" height="7" rx="1.5" fill="var(--color-text)" opacity=".18"></rect><rect x="2.5" y="7" width="11" height="7" rx="1.5" stroke="var(--color-text)" stroke-width="1.3"></rect><path d="M5.2 7V4.9a2.8 2.8 0 0 1 5.6 0V7" stroke="var(--color-text)" stroke-width="1.3"></path></svg>`;
+
 export function checkoutPage(repo: string, clientToken: string, priceId: string): string {
-  const safeRepo = repo.replace(/[<>&"]/g, "");
+  const safeRepo = esc(repo);
+  const [owner, name] = repo.split("/");
+
   return `<!doctype html>
 <html>
 <head>
 <meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
 <title>DocDrifter — activate ${safeRepo}</title>
 <style>
-  body { font-family: system-ui, sans-serif; max-width: 480px; margin: 4rem auto; padding: 0 1rem; }
-  h1 { font-size: 1.25rem; }
-  button { font-size: 1rem; padding: 0.75rem 1.5rem; cursor: pointer; }
+${BASE_STYLES}
+body { display: flex; justify-content: center; align-items: center; min-height: 100vh; padding: 24px 16px; }
+.wrap { width: 420px; max-width: 100%; }
+.brand-row { display: flex; align-items: center; gap: 9px; justify-content: center; margin-bottom: 22px; }
+.brand { font-family: var(--font-heading); font-weight: 600; font-size: 18px; letter-spacing: -0.01em; }
+.panel { padding: 36px 34px; text-align: center; }
+.repo-pill { justify-content: center; width: 100%; }
+h1 { font-size: 22px; margin-top: 18px; line-height: 1.35; }
+p.lede { font-size: 14px; line-height: 21px; color: var(--color-text-muted); margin: 12px 0 0; }
+.divider { height: 1px; background: var(--color-divider); margin: 26px 0; }
+.price-row { display: flex; align-items: baseline; justify-content: center; gap: 8px; }
+.price { font-family: var(--font-heading); font-weight: 600; font-size: 40px; letter-spacing: -0.02em; color: var(--brand); }
+.price-unit { font-size: 13px; color: var(--color-text-faint); }
+#checkout-btn { width: 100%; justify-content: center; margin-top: 22px; font-size: 15px; padding: 12px 18px; }
+.fine-print { font-size: 12.5px; color: var(--color-text-faint); margin-top: 14px; line-height: 18px; }
+.fine-print a { color: var(--color-accent-700); text-decoration: none; }
+.fine-print a:hover { text-decoration: underline; }
 </style>
 </head>
 <body>
-<h1>Activate DocDrifter for <code>${safeRepo}</code></h1>
-<p>This repo is private. DocDrifter is free for public repos, and a paid subscription for private ones.</p>
-<button id="checkout-btn">Subscribe</button>
+<div class="wrap">
+  <div class="brand-row">
+    ${BOOK_ICON}
+    <span class="brand">DocDrifter</span>
+  </div>
+  <div class="panel card">
+    <span class="pill repo-pill">${LOCK_ICON} ${esc(owner ?? "")}/${esc(name ?? "")}</span>
+    <h1>Activate DocDrifter for this repo</h1>
+    <p class="lede">This repo is private. DocDrifter is free for public repos, and a paid subscription for private ones.</p>
+    <div class="divider"></div>
+    <div class="price-row">
+      <span class="price">$9</span>
+      <span class="price-unit">/ month<br>per repo</span>
+    </div>
+    <button id="checkout-btn" class="btn btn-primary">Subscribe</button>
+    <p class="fine-print">Paddle checkout · cancel any time · <a href="/privacy">privacy</a> · <a href="/terms">terms</a></p>
+  </div>
+</div>
 <script src="https://cdn.paddle.com/paddle/v2/paddle.js"></script>
 <script>
-  Paddle.Environment.set("production");
-  Paddle.Initialize({
-    token: "${clientToken}",
-    eventCallback: function (event) {
-      if (event.name === "checkout.completed") {
-        window.location.href = "/status?repo=" + encodeURIComponent("${safeRepo}");
-      }
+Paddle.Environment.set("production");
+Paddle.Initialize({
+  token: "${clientToken}",
+  eventCallback: function (event) {
+    if (event.name === "checkout.completed") {
+      window.location.href = "/status?repo=" + encodeURIComponent("${safeRepo}");
     }
+  }
+});
+document.getElementById("checkout-btn").addEventListener("click", function () {
+  Paddle.Checkout.open({
+    items: [{ priceId: "${priceId}", quantity: 1 }],
+    customData: { repo: "${safeRepo}" }
   });
-  document.getElementById("checkout-btn").addEventListener("click", function () {
-    Paddle.Checkout.open({
-      items: [{ priceId: "${priceId}", quantity: 1 }],
-      customData: { repo: "${safeRepo}" }
-    });
-  });
+});
 </script>
 </body>
 </html>`;

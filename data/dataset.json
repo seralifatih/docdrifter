@@ -1180,7 +1180,7 @@
         "status": "modified",
         "additions": 8,
         "deletions": 1,
-        "patch": "@@ -9,13 +9,20 @@ Basic concepts on the authentication support:\n - Use [`apiflask.HTTPBasicAuth`](/api/security/#apiflask.security.HTTPBasicAuth)\n   for the HTTP Basic authentication.\n - Use [`apiflask.HTTPTokenAuth`](/api/security/#apiflask.security.HTTPTokenAuth)\n-  for the HTTP Bearer or API Keys authentication.\n+  for the HTTP Bearer authentication.\n+- Use [`apiflask.APIKeyHeaderAuth`](/api/security/#apiflask.security.APIKeyHeaderAuth)[`apiflask.APIKeyCookieAuth`](/api/security/#apiflask.security.APIKeyCookieAuth)[`apiflask.APIKeyQueryAuth`](/api/security/#apiflask.security.APIKeyQueryAuth)\n+  for the API Keys authentication.\n+- Use [`apiflask.MultiAuth`](/api/security/#apiflask.security.MultiAuth)\n+  for protecting a route with more than one authentication object.\n - Read [Flask-HTTPAuth's documentation](https://flask-httpauth.readthedocs.io/)\n   for the implemention of each authentication types.\n - Make sure to import `HTTPBasicAuth` and `HTTPTokenAuth` from APIFlask and use the\n   `app.auth_required` decorator to protect the views.\n - `auth.current_user` works just like `auth.current_user()`, but shorter.\n \n+!!! warning\n+\n+    Cookie authentication is currently not supported for \u201ctry it out\u201d requests due to browser security restrictions in Swagger UI.  See this [issue](https://github.com/swagger-api/swagger-js/issues/1163) for more information.\n \n ## Use external authentication library\n "
+        "patch": "@@ -9,13 +9,20 @@ Basic concepts on the authentication support:\n - Use [`apiflask.HTTPBasicAuth`](/api/security/#apiflask.security.HTTPBasicAuth)\n   for the HTTP Basic authentication.\n - Use [`apiflask.HTTPTokenAuth`](/api/security/#apiflask.security.HTTPTokenAuth)\n-  for the HTTP Bearer or API Keys authentication.\n+  for the HTTP Bearer authentication.\n+- Use [`apiflask.APIKeyHeaderAuth`](/api/security/#apiflask.security.APIKeyHeaderAuth)[`apiflask.APIKeyCookieAuth`](/api/security/#apiflask.security.APIKeyCookieAuth)[`apiflask.APIKeyQueryAuth`](/api/security/#apiflask.security.APIKeyQueryAuth)\n+  for the API Keys authentication.\n+- Use [`apiflask.MultiAuth`](/api/security/#apiflask.security.MultiAuth)\n+  for protecting a route with more than one authentication object.\n - Read [Flask-HTTPAuth's documentation](https://flask-httpauth.readthedocs.io/)\n   for the implemention of each authentication types.\n - Make sure to import `HTTPBasicAuth` and `HTTPTokenAuth` from APIFlask and use the\n   `app.auth_required` decorator to protect the views.\n - `auth.current_user` works just like `auth.current_user()`, but shorter.\n \n+!!! warning\n+\n+    Cookie authentication is currently not supported for “try it out” requests due to browser security restrictions in Swagger UI.  See this [issue](https://github.com/swagger-api/swagger-js/issues/1163) for more information.\n \n ## Use external authentication library\n "
       },
       {
         "filename": "docs/migration_guide.md",
@@ -1357,7 +1357,7 @@
     "title": "Add parameter 'docs_oauth2_redirect_path_external' to support absolute redirect url.",
     "url": "https://github.com/apiflask/apiflask/pull/642",
     "mergedAt": "2025-01-03T10:18:35Z",
-    "ground_truth_docs_affected": false,
+    "ground_truth_docs_affected": true,
     "docs_files_touched": [],
     "src_files": [
       "src/apiflask/app.py"
@@ -1377,7 +1377,8 @@
         "deletions": 0,
         "patch": "@@ -69,6 +69,19 @@ def test_docs_oauth2_redirect_path(client):\n     assert rv.status_code == 200\n     assert b'oauth2RedirectUrl: \"/docs/oauth2/redirect\"' in rv.data\n \n+    # Test the feature of external oauth2 redirect path\n+    app = APIFlask(\n+        __name__,\n+        docs_oauth2_redirect_path='/docs/oauth2/redirect/external',\n+        docs_oauth2_redirect_path_external=True,\n+    )\n+    rv = app.test_client().get('/docs/oauth2/redirect/external')\n+    assert rv.status_code == 200\n+    assert b'<title>Swagger UI: OAuth2 Redirect</title>' in rv.data\n+    rv = app.test_client().get('/docs')\n+    assert rv.status_code == 200\n+    assert b'oauth2RedirectUrl: \"http://localhost/docs/oauth2/redirect/external\"' in rv.data\n+\n     app = APIFlask(__name__, docs_oauth2_redirect_path=None)\n     assert app.docs_oauth2_redirect_path is None\n "
       }
-    ]
+    ],
+    "ground_truth_note": "Corrected 2026-08-27: manual FP review (data/fp_manual_review.json) confirmed this PR is real drift (\"Gercek drift\"); original ground truth was a labeling miss caught only after seeing the model flag it."
   },
   {
     "number": 632,
@@ -2181,7 +2182,7 @@
     "title": "Switch to pyproject.toml",
     "url": "https://github.com/apiflask/apiflask/pull/560",
     "mergedAt": "2024-04-21T09:06:41Z",
-    "ground_truth_docs_affected": false,
+    "ground_truth_docs_affected": true,
     "docs_files_touched": [],
     "src_files": [
       "src/apiflask/__init__.py"
@@ -2278,7 +2279,8 @@
         "deletions": 1,
         "patch": "@@ -1,3 +1,5 @@\n+import typing as t\n+\n from . import fields as fields\n from . import validators as validators\n from .app import APIFlask as APIFlask\n@@ -13,4 +15,19 @@\n from .security import HTTPBasicAuth as HTTPBasicAuth\n from .security import HTTPTokenAuth as HTTPTokenAuth\n \n-__version__ = '2.1.2-dev'\n+\n+def __getattr__(name: str) -> t.Any:  # pragma: no cover\n+    if name == '__version__':\n+        import importlib.metadata\n+        import warnings\n+\n+        warnings.warn(\n+            \"The '__version__' attribute is deprecated and will be removed in\"\n+            ' APIFlask 3.0.0. Use feature detection or'\n+            \" 'importlib.metadata.version(\\\"apiflask\\\")' instead.\",\n+            DeprecationWarning,\n+            stacklevel=2,\n+        )\n+        return importlib.metadata.version('apiflask')\n+\n+    raise AttributeError(name)"
       }
-    ]
+    ],
+    "ground_truth_note": "Corrected 2026-08-27: manual FP review (data/fp_manual_review.json) confirmed this PR is real drift (\"Gercek drift\"); original ground truth was a labeling miss caught only after seeing the model flag it."
   },
   {
     "number": 550,
