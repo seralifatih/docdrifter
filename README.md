@@ -69,14 +69,23 @@ jobs:
 
 No API key to configure — the action proves its identity to DocDrifter's
 backend via a GitHub Actions OIDC token, which is why `id-token: write` is
-required. **Free for public repos.** Private repos need an active
-subscription; if yours isn't licensed yet, DocDrifter will comment on your
-next PR with a link to activate it.
+required. **Free for public repos.**
 
-Check a repo's subscription status anytime at
-`https://docdrifter.com/status?repo=owner/name` — it shows whether the repo
-is licensed, the next renewal date, and a link to Paddle's customer portal
-for invoices, card updates, and cancellation.
+Private repos need two things: the
+[DocDrifter Dashboard GitHub App](https://github.com/apps/docdrifter-dashboard/installations/new)
+installed on the account or org (that's how billing knows which repos belong
+together), and an active subscription on that installation. Billing is per
+installation, not per repo — one subscription's quantity tracks every
+private repo under it, at $9/repo/month, and a newly added repo is covered
+automatically. If a repo isn't licensed yet, DocDrifter will comment on your
+next PR with a link to fix it.
+
+Check a repo's status anytime at
+`https://docdrifter.com/status?repo=owner/name` — it shows whether it's
+licensed, the next renewal date, and a link to Paddle's customer portal for
+invoices, card updates, and cancellation. Each repo also has a monthly
+fair-use cap (100 PR checks for private, 50 for public); see
+[Terms](https://docdrifter.com/terms) for why.
 
 ## Data and privacy
 
