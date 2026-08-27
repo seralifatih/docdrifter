@@ -228,19 +228,20 @@ section { padding: calc(2.2 * var(--leading)) 0; }
         <h2 style="font-size:22px;line-height:var(--leading)">Private repositories</h2>
         <div style="display:flex;align-items:baseline;gap:8px;margin-top:var(--leading)">
           <span class="price-num">$9</span>
-          <span style="font-family:var(--mono);font-size:14px;color:var(--color-text-muted)">/ month</span>
+          <span style="font-family:var(--mono);font-size:14px;color:var(--color-text-muted)">/ repo / month</span>
         </div>
-        <p style="font-size:14px;line-height:22px;margin:10px 0 0;color:var(--color-text-muted);font-family:var(--mono)">per repository, cancel anytime</p>
+        <p style="font-size:14px;line-height:22px;margin:10px 0 0;color:var(--color-text-muted);font-family:var(--mono)">one subscription per GitHub install, price drops as repo count grows</p>
         <div class="feature-list">
           <div class="feature-item"><span class="dot-mark">·</span><span>Everything in the free tier</span></div>
+          <div class="feature-item"><span class="dot-mark">·</span><span>One subscription covers every private repo in your account or org</span></div>
+          <div class="feature-item"><span class="dot-mark">·</span><span>New repo added later gets covered automatically</span></div>
           <div class="feature-item"><span class="dot-mark">·</span><span>Dashboard to manage every repo in one place</span></div>
-          <div class="feature-item"><span class="dot-mark">·</span><span>Manage or cancel anytime</span></div>
           <div class="feature-item"><span class="dot-mark">·</span><span>Custom docs/source paths and skip labels</span></div>
         </div>
         <a href="#install" class="btn btn-secondary" style="margin-top:var(--leading)">Start on a private repo</a>
       </div>
     </div>
-    <p style="font-size:13.5px;line-height:22px;margin:var(--half) 0 0;color:var(--color-text-faint)">Activating several private repos at once? Email <a href="mailto:h.f.ilhan@gmail.com">h.f.ilhan@gmail.com</a> — happy to work out a team rate instead of stacking per-repo subscriptions.</p>
+    <p style="font-size:13.5px;line-height:22px;margin:var(--half) 0 0;color:var(--color-text-faint)">Billing is per GitHub installation, not per repo — install DocDrifter Dashboard once on your account or org, and one subscription's quantity tracks how many private repos it covers. Paddle applies volume price breaks automatically as that count grows; no separate subscription to manage for each repo.</p>
   </section>
 
   <section id="install">

@@ -1,4 +1,4 @@
-import type { RepoRow } from "./db";
+import type { SubscriptionRow } from "./db";
 import { BASE_STYLES } from "./styles";
 
 function esc(s: string): string {
@@ -12,6 +12,7 @@ const MANAGE_ICON = `<svg width="14" height="14" viewBox="0 0 16 16" fill="none"
 const STATUS_COLORS: Record<string, string> = {
   free: "#1a7f4e",
   active: "#1a7f4e",
+  under_quota: "#a56a00",
   past_due: "#a56a00",
   cancelled: "#b23b2e",
   paused: "#a56a00",
@@ -23,6 +24,8 @@ function statusLabel(status: string): string {
       return "Free (public)";
     case "active":
       return "Active";
+    case "under_quota":
+      return "Plan under quota";
     case "past_due":
       return "Past due";
     case "paused":
@@ -32,12 +35,20 @@ function statusLabel(status: string): string {
   }
 }
 
-function repoCardHtml(repo: string, isPrivate: boolean, row: RepoRow | null): string {
-  // Public repos are always free -- they never get a `repos` row (that
-  // table only tracks Paddle subscriptions), so "no row" only means
-  // "not activated" for a private repo. A public repo with no row is
-  // simply free, not unlicensed.
-  const status = !isPrivate ? "free" : row?.status ?? "cancelled";
+function repoCardHtml(repo: string, isPrivate: boolean, sub: SubscriptionRow | null, privateCount: number): string {
+  // Public repos are always free -- licensing only applies to private ones.
+  // For private repos, status comes from the installation's one shared
+  // subscription, not a per-repo row -- there's no such thing anymore.
+  let status: string;
+  if (!isPrivate) {
+    status = "free";
+  } else if (!sub || sub.status === "cancelled") {
+    status = "cancelled";
+  } else if (sub.status === "active" && sub.quantity < privateCount) {
+    status = "under_quota";
+  } else {
+    status = sub.status;
+  }
   const color = STATUS_COLORS[status] ?? "#b23b2e";
   return `
   <a class="repo-card card" href="/status?repo=${encodeURIComponent(repo)}">
@@ -55,11 +66,22 @@ function repoCardHtml(repo: string, isPrivate: boolean, row: RepoRow | null): st
 export function dashboardPage(
   login: string,
   avatarUrl: string | null,
-  repos: Array<{ repo: string; isPrivate: boolean; row: RepoRow | null }>,
+  repos: Array<{ repo: string; isPrivate: boolean; installationId: number; subscription: SubscriptionRow | null }>,
   installUrl: string
 ): string {
+  const privateCountByInstallation = new Map<number, number>();
+  for (const r of repos) {
+    if (r.isPrivate) {
+      privateCountByInstallation.set(r.installationId, (privateCountByInstallation.get(r.installationId) ?? 0) + 1);
+    }
+  }
+
   const rows = repos.length
-    ? `<div class="repo-grid">${repos.map((r) => repoCardHtml(r.repo, r.isPrivate, r.row)).join("")}</div>`
+    ? `<div class="repo-grid">${repos
+        .map((r) =>
+          repoCardHtml(r.repo, r.isPrivate, r.subscription, privateCountByInstallation.get(r.installationId) ?? 0)
+        )
+        .join("")}</div>`
     : `<div class="empty-state card">
          <p>No repos yet. Install DocDrifter Dashboard on a repo to see it here.</p>
          <a class="btn btn-primary" href="${esc(installUrl)}">Install on a repo</a>

@@ -1,7 +1,7 @@
-import { upsertRepoBySubscription, type RepoStatus } from "./db";
+import { upsertSubscriptionByPaddleId, type SubscriptionStatus } from "./db";
 import { timingSafeEqualHex, computeHmac } from "./crypto";
 
-function mapPaddleStatus(paddleStatus: string): RepoStatus {
+function mapPaddleStatus(paddleStatus: string): SubscriptionStatus {
   switch (paddleStatus) {
     case "active":
     case "trialing":
@@ -46,9 +46,43 @@ interface PaddleEvent {
     customer_id?: string;
     subscription_id?: string; // present on transaction.* events
     status?: string;
-    custom_data?: { repo?: string } | null;
+    custom_data?: { installation_id?: number } | null;
     current_billing_period?: { ends_at?: string } | null;
+    items?: { quantity: number }[]; // present on subscription.* events
   };
+}
+
+function totalQuantity(items: { quantity: number }[] | undefined): number | undefined {
+  if (!items) return undefined;
+  return items.reduce((sum, item) => sum + item.quantity, 0);
+}
+
+// Bumps (or shrinks) the quantity on an already-active Paddle subscription,
+// so a newly-added private repo is covered immediately instead of waiting
+// for the customer to notice and update it manually. Paddle prorates the
+// difference onto the next invoice by default.
+export async function updateSubscriptionQuantity(
+  apiKey: string,
+  subscriptionId: string,
+  priceId: string,
+  quantity: number
+): Promise<boolean> {
+  try {
+    const resp = await fetch(`https://api.paddle.com/subscriptions/${subscriptionId}`, {
+      method: "PATCH",
+      headers: {
+        Authorization: `Bearer ${apiKey}`,
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        items: [{ price_id: priceId, quantity }],
+        proration_billing_mode: "prorated_immediately",
+      }),
+    });
+    return resp.ok;
+  } catch {
+    return false;
+  }
 }
 
 export async function createPortalSessionUrl(
@@ -81,16 +115,17 @@ export async function handlePaddleEvent(db: D1Database, raw: string): Promise<vo
 
   switch (event.event_type) {
     case "subscription.created": {
-      const repo = data.custom_data?.repo;
-      if (!repo) {
-        // No repo to attach this subscription to -- nothing we can do.
+      const installationId = data.custom_data?.installation_id;
+      if (!installationId) {
+        // No installation to attach this subscription to -- nothing we can do.
         return;
       }
-      await upsertRepoBySubscription(db, {
-        repo,
+      await upsertSubscriptionByPaddleId(db, {
+        installationId,
         paddleSubscriptionId: data.id,
         paddleCustomerId: data.customer_id ?? "",
         status: mapPaddleStatus(data.status ?? "active"),
+        quantity: totalQuantity(data.items),
         currentPeriodEnd: data.current_billing_period?.ends_at ?? null,
       });
       return;
@@ -98,10 +133,11 @@ export async function handlePaddleEvent(db: D1Database, raw: string): Promise<vo
 
     case "subscription.updated":
     case "subscription.canceled": {
-      await upsertRepoBySubscription(db, {
+      await upsertSubscriptionByPaddleId(db, {
         paddleSubscriptionId: data.id,
         paddleCustomerId: data.customer_id ?? "",
         status: mapPaddleStatus(data.status ?? "cancelled"),
+        quantity: totalQuantity(data.items),
         currentPeriodEnd: data.current_billing_period?.ends_at ?? null,
       });
       return;
@@ -109,7 +145,7 @@ export async function handlePaddleEvent(db: D1Database, raw: string): Promise<vo
 
     case "transaction.completed": {
       if (!data.subscription_id) return;
-      await upsertRepoBySubscription(db, {
+      await upsertSubscriptionByPaddleId(db, {
         paddleSubscriptionId: data.subscription_id,
         paddleCustomerId: data.customer_id ?? "",
         status: "active",
@@ -119,7 +155,7 @@ export async function handlePaddleEvent(db: D1Database, raw: string): Promise<vo
 
     case "transaction.payment_failed": {
       if (!data.subscription_id) return;
-      await upsertRepoBySubscription(db, {
+      await upsertSubscriptionByPaddleId(db, {
         paddleSubscriptionId: data.subscription_id,
         paddleCustomerId: data.customer_id ?? "",
         status: "past_due",

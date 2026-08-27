@@ -1,4 +1,6 @@
 import { timingSafeEqualHex, computeHmac } from "./crypto";
+import { getSubscription, setSubscriptionQuantity, countPrivateRepos } from "./db";
+import { updateSubscriptionQuantity } from "./paddle";
 
 export async function verifyGithubWebhookSignature(
   signatureHeader: string | null,
@@ -89,8 +91,35 @@ async function handleInstallationEvent(db: D1Database, event: InstallationEvent)
   // Other actions (suspend/unsuspend/new_permissions_accepted, etc.) are fine to ignore.
 }
 
+interface PaddleSyncEnv {
+  PADDLE_API_KEY: string;
+  PADDLE_PRICE_ID: string;
+}
+
+// After a repo is added/removed under an installation that already has an
+// active or past_due subscription, push its private-repo count to Paddle as
+// the new quantity -- so a newly-added private repo is covered immediately
+// instead of silently failing licensing until someone notices. Best-effort:
+// if the Paddle call fails, the DB keeps the old quantity and the repo will
+// show as "under quota" on the dashboard rather than being silently broken.
+async function syncSubscriptionQuantity(db: D1Database, env: PaddleSyncEnv, installationId: number): Promise<void> {
+  const sub = await getSubscription(db, installationId);
+  if (!sub || !sub.paddle_subscription_id || (sub.status !== "active" && sub.status !== "past_due")) {
+    return;
+  }
+  const privateCount = await countPrivateRepos(db, installationId);
+  if (privateCount === sub.quantity) return;
+  const ok = await updateSubscriptionQuantity(env.PADDLE_API_KEY, sub.paddle_subscription_id, env.PADDLE_PRICE_ID, privateCount);
+  if (ok) {
+    await setSubscriptionQuantity(db, installationId, privateCount);
+  }
+  // If it fails, we leave the stored quantity alone -- Paddle's own
+  // subscription.updated webhook (or a future retry) will reconcile it.
+}
+
 async function handleInstallationRepositoriesEvent(
   db: D1Database,
+  env: PaddleSyncEnv,
   event: InstallationRepositoriesEvent
 ): Promise<void> {
   if (event.action === "added" && event.repositories_added) {
@@ -99,10 +128,12 @@ async function handleInstallationRepositoriesEvent(
   if (event.action === "removed" && event.repositories_removed) {
     await removeInstallationRepos(db, event.installation.id, event.repositories_removed);
   }
+  await syncSubscriptionQuantity(db, env, event.installation.id);
 }
 
 export async function handleGithubWebhookEvent(
   db: D1Database,
+  env: PaddleSyncEnv,
   eventType: string | null,
   raw: string
 ): Promise<void> {
@@ -113,7 +144,7 @@ export async function handleGithubWebhookEvent(
       await handleInstallationEvent(db, JSON.parse(raw) as InstallationEvent);
       return;
     case "installation_repositories":
-      await handleInstallationRepositoriesEvent(db, JSON.parse(raw) as InstallationRepositoriesEvent);
+      await handleInstallationRepositoriesEvent(db, env, JSON.parse(raw) as InstallationRepositoriesEvent);
       return;
     default:
       // Unhandled event types are fine to ignore.

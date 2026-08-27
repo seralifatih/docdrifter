@@ -1,4 +1,4 @@
-import type { RepoRow } from "./db";
+import type { SubscriptionRow } from "./db";
 import { BASE_STYLES } from "./styles";
 
 function esc(s: string): string {
@@ -84,29 +84,37 @@ p.lede { margin: 12px 0 0; max-width: 46ch; font-size: 14.5px; line-height: 22px
 
 export function statusPageActive(
   repo: string,
-  row: RepoRow,
+  row: SubscriptionRow,
   portalUrl: string | null,
-  priceLabel: string
+  accountLogin: string
 ): string {
   const dateline = new Date().toLocaleDateString("en-GB", { day: "2-digit", month: "short", year: "numeric" });
-  const statColor = row.status === "past_due" ? "#a56a00" : "#1a7f4e";
-  const statLabel = row.status === "past_due" ? "Past due" : "Active";
+  const underQuota = row.status === "active" && row.quantity < 1;
+  const statColor = row.status === "past_due" ? "#a56a00" : underQuota ? "#a56a00" : "#1a7f4e";
+  const statLabel = row.status === "past_due" ? "Past due" : underQuota ? "Plan under quota" : "Active";
 
   const manageButton = portalUrl
     ? `<a class="btn btn-primary" href="${esc(portalUrl)}">Manage subscription</a><span class="action-note">Opens Paddle — invoices, card, cancellation.</span>`
     : `<span class="action-note">Manage this subscription from the receipt emailed by Paddle at checkout.</span>`;
 
+  const statusNote = row.status === "past_due"
+    ? "payment needs attention"
+    : underQuota
+      ? "plan quantity doesn't cover every private repo in this installation"
+      : "subscription in good standing";
+
   const body = `
   <div class="status-row">
     <span class="dot" style="background:${statColor};box-shadow:0 0 0 4px color-mix(in srgb, ${statColor} 16%, transparent)"></span>
     <span class="status-label" style="color:${statColor}">${statLabel}</span>
-    <span class="status-note">— ${row.status === "past_due" ? "payment needs attention" : "subscription in good standing"}</span>
+    <span class="status-note">— ${statusNote}</span>
   </div>
   <div class="grid">
     <div><div class="field-label">Next renewal</div><div class="field-value">${formatDate(row.current_period_end)}</div></div>
-    <div><div class="field-label">Plan</div><div class="field-value">${esc(priceLabel)}</div></div>
+    <div><div class="field-label">Plan covers</div><div class="field-value">${row.quantity} repo${row.quantity === 1 ? "" : "s"}</div></div>
   </div>
-  <div class="action-row">${manageButton}</div>`;
+  <p class="lede">This subscription covers every private repo under the <strong>${esc(accountLogin)}</strong> GitHub installation, not just this one. Manage it once from the dashboard instead of per repo.</p>
+  <div class="action-row">${manageButton}<a class="btn btn-secondary" href="/dashboard">View all repos</a></div>`;
 
   return shell(repo, dateline, body);
 }
@@ -129,9 +137,20 @@ export function statusPageNeedsActivation(
   repo: string,
   checkoutUrl: string,
   priceAmount: string,
-  priceUnit: string
+  priceUnit: string,
+  installationRequired: boolean
 ): string {
   const dateline = new Date().toLocaleDateString("en-GB", { day: "2-digit", month: "short", year: "numeric" });
+
+  const cta = installationRequired
+    ? `<div class="action-row">
+        <a class="btn btn-primary" href="${esc(checkoutUrl)}">Install DocDrifter Dashboard</a>
+        <span class="action-note">Private repos need the GitHub App installed before they can be licensed — one install covers your whole account or org.</span>
+      </div>`
+    : `<div class="action-row">
+        <a class="btn btn-primary" href="${esc(checkoutUrl)}">Activate this installation</a>
+        <span class="action-note">Paddle checkout. One subscription covers every private repo you've installed DocDrifter on. Cancel any time.</span>
+      </div>`;
 
   const body = `
   <div class="status-row">
@@ -140,15 +159,12 @@ export function statusPageNeedsActivation(
     <span class="status-note">— the action exits and skips its checks</span>
   </div>
   <h2>Activate DocDrifter for this repo</h2>
-  <p class="lede">Every PR gets its docs read against the diff, and drifted pages come back as a review comment. Private repos need a subscription; public ones don't.</p>
+  <p class="lede">Every PR gets its docs read against the diff, and drifted pages come back as a review comment. Private repos need an active subscription on their GitHub installation; public ones don't.</p>
   <div class="price-row">
     <span class="price">${esc(priceAmount)}</span>
     <span class="price-note">${esc(priceUnit)}</span>
   </div>
-  <div class="action-row">
-    <a class="btn btn-primary" href="${esc(checkoutUrl)}">Subscribe this repo</a>
-    <span class="action-note">Paddle checkout. Cancel any time.</span>
-  </div>`;
+  ${cta}`;
 
   return shell(repo, dateline, body);
 }

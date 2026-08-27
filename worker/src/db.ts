@@ -1,53 +1,63 @@
-export type RepoStatus = "active" | "past_due" | "cancelled" | "paused";
+export type SubscriptionStatus = "active" | "past_due" | "cancelled" | "paused";
 
-export interface RepoRow {
-  repo: string;
-  status: RepoStatus;
+export interface SubscriptionRow {
+  installation_id: number;
+  status: SubscriptionStatus;
+  quantity: number;
   paddle_customer_id: string | null;
   paddle_subscription_id: string | null;
   current_period_end: string | null;
 }
 
-const PAID_STATUSES: RepoStatus[] = ["active", "past_due"];
+const PAID_STATUSES: SubscriptionStatus[] = ["active", "past_due"];
 
-export function isPaid(row: RepoRow | null): boolean {
-  return row !== null && PAID_STATUSES.includes(row.status);
+// A subscription only actually licenses a repo if it's both in a paid
+// status AND its quantity covers the installation's current private repo
+// count -- a lapsed top-up (repo added, quantity never bumped) should not
+// silently license everything under it.
+export function isLicensed(row: SubscriptionRow | null, privateRepoCount: number): boolean {
+  return row !== null && PAID_STATUSES.includes(row.status) && row.quantity >= privateRepoCount;
 }
 
-export async function getRepo(db: D1Database, repo: string): Promise<RepoRow | null> {
+export async function getSubscription(db: D1Database, installationId: number): Promise<SubscriptionRow | null> {
   const row = await db
-    .prepare("SELECT repo, status, paddle_customer_id, paddle_subscription_id, current_period_end FROM repos WHERE repo = ?")
-    .bind(repo.toLowerCase())
-    .first<RepoRow>();
+    .prepare(
+      "SELECT installation_id, status, quantity, paddle_customer_id, paddle_subscription_id, current_period_end FROM subscriptions WHERE installation_id = ?"
+    )
+    .bind(installationId)
+    .first<SubscriptionRow>();
   return row ?? null;
 }
 
-export async function upsertRepoBySubscription(
+export async function upsertSubscriptionByPaddleId(
   db: D1Database,
   args: {
-    repo?: string;
+    installationId?: number;
     paddleSubscriptionId: string;
     paddleCustomerId: string;
-    status: RepoStatus;
+    status: SubscriptionStatus;
+    quantity?: number;
     currentPeriodEnd?: string | null;
   }
 ): Promise<void> {
-  if (args.repo) {
-    // First time we see this subscription: repo comes from customData.
+  if (args.installationId) {
+    // First time we see this subscription: installation id comes from customData.
     await db
       .prepare(
-        `INSERT INTO repos (repo, status, paddle_customer_id, paddle_subscription_id, current_period_end, updated_at)
-         VALUES (?, ?, ?, ?, ?, datetime('now'))
-         ON CONFLICT(repo) DO UPDATE SET
+        `INSERT INTO subscriptions (installation_id, status, quantity, paddle_customer_id, paddle_subscription_id, current_period_end, updated_at)
+         VALUES (?, ?, ?, ?, ?, ?, datetime('now'))
+         ON CONFLICT(installation_id) DO UPDATE SET
            status = excluded.status,
+           quantity = excluded.quantity,
            paddle_customer_id = excluded.paddle_customer_id,
            paddle_subscription_id = excluded.paddle_subscription_id,
            current_period_end = excluded.current_period_end,
            updated_at = datetime('now')`
       )
       .bind(
-        args.repo.toLowerCase(),
+        args.installationId,
         args.status,
+        args.quantity ?? 0,
         args.paddleCustomerId,
         args.paddleSubscriptionId,
         args.currentPeriodEnd ?? null
@@ -59,13 +69,27 @@ export async function upsertRepoBySubscription(
   // Subsequent events (updated/canceled/transaction.*): look up by subscription id.
   await db
     .prepare(
-      `UPDATE repos SET
+      `UPDATE subscriptions SET
          status = ?,
+         quantity = COALESCE(?, quantity),
          current_period_end = COALESCE(?, current_period_end),
          updated_at = datetime('now')
        WHERE paddle_subscription_id = ?`
     )
-    .bind(args.status, args.currentPeriodEnd ?? null, args.paddleSubscriptionId)
+    .bind(args.status, args.quantity ?? null, args.currentPeriodEnd ?? null, args.paddleSubscriptionId)
+    .run();
+}
+
+// Called after Paddle confirms a quantity change (subscription.updated), so
+// the stored quantity always mirrors what's actually being billed.
+export async function setSubscriptionQuantity(
+  db: D1Database,
+  installationId: number,
+  quantity: number
+): Promise<void> {
+  await db
+    .prepare("UPDATE subscriptions SET quantity = ?, updated_at = datetime('now') WHERE installation_id = ?")
+    .bind(quantity, installationId)
     .run();
 }
 
@@ -134,12 +158,13 @@ export async function deleteSession(db: D1Database, sessionId: string): Promise<
 export interface UserRepoRow {
   repo: string;
   is_private: number; // SQLite integer boolean (0/1)
+  installation_id: number;
 }
 
 export async function getReposForUser(db: D1Database, userId: number): Promise<UserRepoRow[]> {
   const result = await db
     .prepare(
-      `SELECT DISTINCT ir.repo, ir.is_private FROM installation_repos ir
+      `SELECT DISTINCT ir.repo, ir.is_private, ir.installation_id FROM installation_repos ir
        JOIN installations i ON i.id = ir.installation_id
        WHERE i.installed_by_user_id = ?
        ORDER BY ir.repo`
@@ -153,16 +178,37 @@ export async function addToWaitlist(db: D1Database, email: string): Promise<void
   await db.prepare("INSERT INTO waitlist (email) VALUES (?)").bind(email.trim().toLowerCase()).run();
 }
 
-// Best-effort: is this repo known to be private from GitHub App install
-// data? Returns null if we've never seen it via an installation webhook
-// (e.g. the App isn't installed on it) -- callers should treat null as
-// "unknown" rather than assuming public, since this is a convenience
-// lookup, not the source of truth GitHub itself is.
-export async function isRepoPrivate(db: D1Database, repo: string): Promise<boolean | null> {
+export interface RepoInstallation {
+  installationId: number;
+  isPrivate: boolean;
+  accountLogin: string;
+}
+
+// The licensing lookup a PR check needs: given a repo, which installation
+// (if any) covers it, and is that repo private. Returns null if the App
+// isn't installed on this repo -- private repos require the App to be
+// licensed at all (see PRIVATE_REPO_REQUIRES_APP note in index.ts).
+export async function getInstallationForRepo(db: D1Database, repo: string): Promise<RepoInstallation | null> {
   const row = await db
-    .prepare("SELECT is_private FROM installation_repos WHERE repo = ? LIMIT 1")
+    .prepare(
+      `SELECT ir.installation_id as installationId, ir.is_private as isPrivate, i.account_login as accountLogin
+       FROM installation_repos ir
+       JOIN installations i ON i.id = ir.installation_id
+       WHERE ir.repo = ?
+       LIMIT 1`
+    )
     .bind(repo.toLowerCase())
-    .first<{ is_private: number }>();
+    .first<{ installationId: number; isPrivate: number; accountLogin: string }>();
   if (!row) return null;
-  return row.is_private === 1;
+  return { installationId: row.installationId, isPrivate: row.isPrivate === 1, accountLogin: row.accountLogin };
+}
+
+// How many private repos does this installation currently have -- the
+// number a subscription's quantity must cover to license all of them.
+export async function countPrivateRepos(db: D1Database, installationId: number): Promise<number> {
+  const row = await db
+    .prepare("SELECT COUNT(*) as n FROM installation_repos WHERE installation_id = ? AND is_private = 1")
+    .bind(installationId)
+    .first<{ n: number }>();
+  return row?.n ?? 0;
 }

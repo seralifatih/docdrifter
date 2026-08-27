@@ -1,4 +1,13 @@
-import { getRepo, isPaid, logRequest, getSession, getReposForUser, isRepoPrivate, addToWaitlist } from "./db";
+import {
+  getSubscription,
+  isLicensed,
+  logRequest,
+  getSession,
+  getReposForUser,
+  addToWaitlist,
+  getInstallationForRepo,
+  countPrivateRepos,
+} from "./db";
 import { verifyGithubOidcToken } from "./oidc";
 import { callDeepSeek } from "./deepseek";
 import { verifyPaddleSignature, handlePaddleEvent, createPortalSessionUrl } from "./paddle";
@@ -18,7 +27,6 @@ export interface Env {
   PADDLE_PRICE_ID: string;
   PADDLE_API_KEY: string;
   CHECKOUT_BASE_URL: string; // e.g. "https://api.docdrifter.dev"
-  PRICE_LABEL: string; // e.g. "Single repo — $9 / month"
   PRICE_AMOUNT: string; // e.g. "$9"
   PRICE_UNIT: string; // e.g. "per month\nper private repo"
   GITHUB_APP_CLIENT_ID: string;
@@ -69,15 +77,35 @@ async function handleEvaluate(req: Request, env: Env): Promise<Response> {
   const repo = trustedRepo;
 
   if (body.is_private) {
-    const row = await getRepo(env.DB, repo);
-    if (!isPaid(row)) {
+    const installation = await getInstallationForRepo(env.DB, repo);
+    if (!installation) {
+      // Private repos must have the GitHub App installed -- that's how we
+      // know which installation (and therefore which subscription) covers
+      // them. No installation on file means no possible license yet.
+      await logRequest(env.DB, { repo, isPrivate: true, allowed: false });
+      return json(
+        {
+          error: "app_not_installed",
+          message:
+            "DocDrifter is free for public repos. This repo is private and needs the DocDrifter Dashboard GitHub App installed before it can be licensed.",
+          checkout_url: `${env.CHECKOUT_BASE_URL}/status?repo=${encodeURIComponent(repo)}`,
+        },
+        402
+      );
+    }
+
+    const [sub, privateCount] = await Promise.all([
+      getSubscription(env.DB, installation.installationId),
+      countPrivateRepos(env.DB, installation.installationId),
+    ]);
+    if (!isLicensed(sub, privateCount)) {
       await logRequest(env.DB, { repo, isPrivate: true, allowed: false });
       const checkoutUrl = `${env.CHECKOUT_BASE_URL}/checkout?repo=${encodeURIComponent(repo)}`;
       return json(
         {
           error: "repo_not_licensed",
           message:
-            "DocDrifter is free for public repos. This repo is private and needs an active subscription.",
+            "DocDrifter is free for public repos. This repo is private and needs an active subscription covering its installation.",
           checkout_url: checkoutUrl,
         },
         402
@@ -122,7 +150,22 @@ async function handleCheckoutPage(req: Request, env: Env): Promise<Response> {
   if (!repo) {
     return new Response("Missing repo parameter", { status: 400 });
   }
-  const html = checkoutPage(repo, env.PADDLE_CLIENT_TOKEN, env.PADDLE_PRICE_ID);
+  const installation = await getInstallationForRepo(env.DB, repo);
+  if (!installation) {
+    return new Response(null, {
+      status: 302,
+      headers: { Location: `/status?repo=${encodeURIComponent(repo)}` },
+    });
+  }
+  const privateCount = await countPrivateRepos(env.DB, installation.installationId);
+  const html = checkoutPage(
+    repo,
+    env.PADDLE_CLIENT_TOKEN,
+    env.PADDLE_PRICE_ID,
+    installation.installationId,
+    installation.accountLogin,
+    privateCount
+  );
   return new Response(html, { headers: { "Content-Type": "text/html; charset=utf-8" } });
 }
 
@@ -133,23 +176,29 @@ async function handleStatusPage(req: Request, env: Env): Promise<Response> {
     return new Response("Missing repo parameter", { status: 400 });
   }
 
-  const row = await getRepo(env.DB, repo);
+  const installation = await getInstallationForRepo(env.DB, repo);
 
   let html: string;
-  if (isPaid(row) && row) {
-    const portalUrl = row.paddle_customer_id
-      ? await createPortalSessionUrl(env.PADDLE_API_KEY, row.paddle_customer_id, row.paddle_subscription_id)
-      : null;
-    html = statusPageActive(repo, row, portalUrl, env.PRICE_LABEL || "Single repo — subscription");
+  if (!installation) {
+    // App isn't installed on this repo at all. We can't tell public/private
+    // from OIDC-only traffic alone, so point at installing the App -- that's
+    // required for any private repo to ever become licensed, and is also
+    // how a public repo would show up here with real status.
+    const checkoutUrl = `${env.CHECKOUT_BASE_URL}/dashboard`;
+    html = statusPageNeedsActivation(repo, checkoutUrl, env.PRICE_AMOUNT || "$9", env.PRICE_UNIT || "per month", true);
+  } else if (!installation.isPrivate) {
+    html = statusPageFree(repo);
   } else {
-    // No paid subscription on file. If we know from GitHub App install
-    // data that this repo is public, it's simply free -- not unlicensed.
-    const isPrivate = await isRepoPrivate(env.DB, repo);
-    if (isPrivate === false) {
-      html = statusPageFree(repo);
+    const sub = await getSubscription(env.DB, installation.installationId);
+    const privateCount = await countPrivateRepos(env.DB, installation.installationId);
+    if (isLicensed(sub, privateCount) && sub) {
+      const portalUrl = sub.paddle_customer_id
+        ? await createPortalSessionUrl(env.PADDLE_API_KEY, sub.paddle_customer_id, sub.paddle_subscription_id)
+        : null;
+      html = statusPageActive(repo, sub, portalUrl, installation.accountLogin);
     } else {
       const checkoutUrl = `${env.CHECKOUT_BASE_URL}/checkout?repo=${encodeURIComponent(repo)}`;
-      html = statusPageNeedsActivation(repo, checkoutUrl, env.PRICE_AMOUNT || "$9", env.PRICE_UNIT || "per month");
+      html = statusPageNeedsActivation(repo, checkoutUrl, env.PRICE_AMOUNT || "$9", env.PRICE_UNIT || "per month", false);
     }
   }
 
@@ -188,7 +237,7 @@ async function handleGithubWebhook(req: Request, env: Env): Promise<Response> {
   }
 
   try {
-    await handleGithubWebhookEvent(env.DB, req.headers.get("X-GitHub-Event"), raw);
+    await handleGithubWebhookEvent(env.DB, env, req.headers.get("X-GitHub-Event"), raw);
     return json({ ok: true }, 200);
   } catch (err) {
     // Non-2xx so GitHub retries rather than silently dropping an install event.
@@ -209,13 +258,18 @@ async function handleDashboardPage(req: Request, env: Env): Promise<Response> {
   }
 
   const userRepos = await getReposForUser(env.DB, session.userId);
-  const repos = await Promise.all(
-    userRepos.map(async (r) => ({
-      repo: r.repo,
-      isPrivate: r.is_private === 1,
-      row: await getRepo(env.DB, r.repo),
-    }))
+  const installationIds = [...new Set(userRepos.map((r) => r.installation_id))];
+  const subsByInstallation = new Map(
+    await Promise.all(
+      installationIds.map(async (id) => [id, await getSubscription(env.DB, id)] as const)
+    )
   );
+  const repos = userRepos.map((r) => ({
+    repo: r.repo,
+    isPrivate: r.is_private === 1,
+    installationId: r.installation_id,
+    subscription: subsByInstallation.get(r.installation_id) ?? null,
+  }));
 
   // login/avatar aren't stored on the session row -- look them up once via
   // the users table so the dashboard header can greet the right person.

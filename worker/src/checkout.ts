@@ -8,20 +8,28 @@ const BOOK_ICON = `<svg width="24" height="24" viewBox="0 0 32 32" fill="none" a
 
 const LOCK_ICON = `<svg width="14" height="14" viewBox="0 0 16 16" fill="none" aria-hidden="true"><rect x="2.5" y="7" width="11" height="7" rx="1.5" fill="var(--color-text)" opacity=".18"></rect><rect x="2.5" y="7" width="11" height="7" rx="1.5" stroke="var(--color-text)" stroke-width="1.3"></rect><path d="M5.2 7V4.9a2.8 2.8 0 0 1 5.6 0V7" stroke="var(--color-text)" stroke-width="1.3"></path></svg>`;
 
-export function checkoutPage(repo: string, clientToken: string, priceId: string): string {
+export function checkoutPage(
+  repo: string,
+  clientToken: string,
+  priceId: string,
+  installationId: number,
+  accountLogin: string,
+  privateRepoCount: number
+): string {
   const safeRepo = esc(repo);
-  const [owner, name] = repo.split("/");
+  const safeAccount = esc(accountLogin);
+  const qty = Math.max(privateRepoCount, 1);
 
   return `<!doctype html>
 <html>
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>DocDrifter — activate ${safeRepo}</title>
+<title>DocDrifter — activate ${safeAccount}</title>
 <style>
 ${BASE_STYLES}
 body { display: flex; justify-content: center; align-items: center; min-height: 100vh; padding: 24px 16px; }
-.wrap { width: 420px; max-width: 100%; }
+.wrap { width: 440px; max-width: 100%; }
 .brand-row { display: flex; align-items: center; gap: 9px; justify-content: center; margin-bottom: 22px; }
 .brand { font-family: var(--font-heading); font-weight: 600; font-size: 18px; letter-spacing: -0.01em; }
 .panel { padding: 36px 34px; text-align: center; }
@@ -32,6 +40,7 @@ p.lede { font-size: 14px; line-height: 21px; color: var(--color-text-muted); mar
 .price-row { display: flex; align-items: baseline; justify-content: center; gap: 8px; }
 .price { font-family: var(--font-heading); font-weight: 600; font-size: 40px; letter-spacing: -0.02em; color: var(--brand); }
 .price-unit { font-size: 13px; color: var(--color-text-faint); }
+.qty-note { font-size: 13px; color: var(--color-text-muted); margin-top: 8px; }
 #checkout-btn { width: 100%; justify-content: center; margin-top: 22px; font-size: 15px; padding: 12px 18px; }
 .fine-print { font-size: 12.5px; color: var(--color-text-faint); margin-top: 14px; line-height: 18px; }
 .fine-print a { color: var(--color-accent-700); text-decoration: none; }
@@ -45,14 +54,15 @@ p.lede { font-size: 14px; line-height: 21px; color: var(--color-text-muted); mar
     <span class="brand">DocDrifter</span>
   </div>
   <div class="panel card">
-    <span class="pill repo-pill">${LOCK_ICON} ${esc(owner ?? "")}/${esc(name ?? "")}</span>
-    <h1>Activate DocDrifter for this repo</h1>
-    <p class="lede">This repo is private. DocDrifter is free for public repos, and a paid subscription for private ones.</p>
+    <span class="pill repo-pill">${LOCK_ICON} ${safeAccount}</span>
+    <h1>Activate DocDrifter for ${safeAccount}</h1>
+    <p class="lede">This subscription covers every private repo under this GitHub installation — not just <code>${safeRepo}</code>. Public repos stay free and don't count toward the total.</p>
     <div class="divider"></div>
     <div class="price-row">
       <span class="price">$9</span>
-      <span class="price-unit">/ month<br>per repo</span>
+      <span class="price-unit">/ repo / month<br>volume pricing applies at checkout</span>
     </div>
+    <p class="qty-note">${qty} private repo${qty === 1 ? "" : "s"} on this installation today</p>
     <button id="checkout-btn" class="btn btn-primary">Subscribe</button>
     <p class="fine-print">Paddle checkout · cancel any time · <a href="/privacy">privacy</a> · <a href="/terms">terms</a></p>
   </div>
@@ -70,8 +80,8 @@ Paddle.Initialize({
 });
 document.getElementById("checkout-btn").addEventListener("click", function () {
   Paddle.Checkout.open({
-    items: [{ priceId: "${priceId}", quantity: 1 }],
-    customData: { repo: "${safeRepo}" }
+    items: [{ priceId: "${priceId}", quantity: ${qty} }],
+    customData: { installation_id: ${installationId} }
   });
 });
 </script>
