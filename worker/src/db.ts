@@ -131,15 +131,34 @@ export async function deleteSession(db: D1Database, sessionId: string): Promise<
   await db.prepare("DELETE FROM sessions WHERE id = ?").bind(sessionId).run();
 }
 
-export async function getReposForUser(db: D1Database, userId: number): Promise<string[]> {
+export interface UserRepoRow {
+  repo: string;
+  is_private: number; // SQLite integer boolean (0/1)
+}
+
+export async function getReposForUser(db: D1Database, userId: number): Promise<UserRepoRow[]> {
   const result = await db
     .prepare(
-      `SELECT DISTINCT ir.repo FROM installation_repos ir
+      `SELECT DISTINCT ir.repo, ir.is_private FROM installation_repos ir
        JOIN installations i ON i.id = ir.installation_id
        WHERE i.installed_by_user_id = ?
        ORDER BY ir.repo`
     )
     .bind(userId)
-    .all<{ repo: string }>();
-  return (result.results ?? []).map((r) => r.repo);
+    .all<UserRepoRow>();
+  return result.results ?? [];
+}
+
+// Best-effort: is this repo known to be private from GitHub App install
+// data? Returns null if we've never seen it via an installation webhook
+// (e.g. the App isn't installed on it) -- callers should treat null as
+// "unknown" rather than assuming public, since this is a convenience
+// lookup, not the source of truth GitHub itself is.
+export async function isRepoPrivate(db: D1Database, repo: string): Promise<boolean | null> {
+  const row = await db
+    .prepare("SELECT is_private FROM installation_repos WHERE repo = ? LIMIT 1")
+    .bind(repo.toLowerCase())
+    .first<{ is_private: number }>();
+  if (!row) return null;
+  return row.is_private === 1;
 }

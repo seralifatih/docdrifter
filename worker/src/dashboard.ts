@@ -7,6 +7,7 @@ function esc(s: string): string {
 const BOOK_ICON = `<svg width="26" height="26" viewBox="0 0 32 32" fill="none" aria-hidden="true"><path d="M16 8.5C13 6 8.5 5.5 4 6v18c4.5-.5 9 0 12 2.5 3-2.5 7.5-3 12-2.5V6c-4.5-.5-9 0-12 2.5Z" fill="var(--brand)" opacity=".22"></path><path d="M16 8.5C13 6 8.5 5.5 4 6v18c4.5-.5 9 0 12 2.5 3-2.5 7.5-3 12-2.5V6c-4.5-.5-9 0-12 2.5Z" stroke="var(--brand)" stroke-width="1.6" stroke-linejoin="round"></path><path d="M16 8.5v20" stroke="var(--brand)" stroke-width="1.6"></path></svg>`;
 
 const STATUS_COLORS: Record<string, string> = {
+  free: "#2f7d4f",
   active: "#2f7d4f",
   past_due: "#9a6b00",
   cancelled: "#b23b2e",
@@ -15,6 +16,8 @@ const STATUS_COLORS: Record<string, string> = {
 
 function statusLabel(status: string): string {
   switch (status) {
+    case "free":
+      return "Free (public)";
     case "active":
       return "Active";
     case "past_due":
@@ -26,8 +29,12 @@ function statusLabel(status: string): string {
   }
 }
 
-function repoRowHtml(repo: string, row: RepoRow | null): string {
-  const status = row?.status ?? "cancelled";
+function repoRowHtml(repo: string, isPrivate: boolean, row: RepoRow | null): string {
+  // Public repos are always free -- they never get a `repos` row (that
+  // table only tracks Paddle subscriptions), so "no row" only means
+  // "not activated" for a private repo. A public repo with no row is
+  // simply free, not unlicensed.
+  const status = !isPrivate ? "free" : row?.status ?? "cancelled";
   const color = STATUS_COLORS[status] ?? "#b23b2e";
   return `
   <div class="repo-row">
@@ -43,11 +50,11 @@ function repoRowHtml(repo: string, row: RepoRow | null): string {
 export function dashboardPage(
   login: string,
   avatarUrl: string | null,
-  repos: Array<{ repo: string; row: RepoRow | null }>,
+  repos: Array<{ repo: string; isPrivate: boolean; row: RepoRow | null }>,
   installUrl: string
 ): string {
   const rows = repos.length
-    ? repos.map((r) => repoRowHtml(r.repo, r.row)).join("")
+    ? repos.map((r) => repoRowHtml(r.repo, r.isPrivate, r.row)).join("")
     : `<div class="empty-state">
          <p>No repos yet. Install DocDrifter Dashboard on a repo to see it here.</p>
          <a class="btn btn-primary" href="${esc(installUrl)}">Install on a repo</a>

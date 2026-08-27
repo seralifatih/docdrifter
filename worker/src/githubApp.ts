@@ -15,6 +15,7 @@ export async function verifyGithubWebhookSignature(
 
 interface RepoRef {
   full_name: string; // "owner/name"
+  private: boolean;
 }
 
 interface InstallationEvent {
@@ -37,8 +38,12 @@ interface InstallationRepositoriesEvent {
 async function addInstallationRepos(db: D1Database, installationId: number, repos: RepoRef[]): Promise<void> {
   for (const r of repos) {
     await db
-      .prepare("INSERT OR IGNORE INTO installation_repos (installation_id, repo) VALUES (?, ?)")
-      .bind(installationId, r.full_name.toLowerCase())
+      .prepare(
+        `INSERT INTO installation_repos (installation_id, repo, is_private)
+         VALUES (?, ?, ?)
+         ON CONFLICT(installation_id, repo) DO UPDATE SET is_private = excluded.is_private`
+      )
+      .bind(installationId, r.full_name.toLowerCase(), r.private ? 1 : 0)
       .run();
   }
 }

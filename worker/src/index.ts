@@ -1,9 +1,9 @@
-import { getRepo, isPaid, logRequest, getSession, getReposForUser } from "./db";
+import { getRepo, isPaid, logRequest, getSession, getReposForUser, isRepoPrivate } from "./db";
 import { verifyGithubOidcToken } from "./oidc";
 import { callDeepSeek } from "./deepseek";
 import { verifyPaddleSignature, handlePaddleEvent, createPortalSessionUrl } from "./paddle";
 import { checkoutPage } from "./checkout";
-import { statusPageActive, statusPageNeedsActivation } from "./status";
+import { statusPageActive, statusPageNeedsActivation, statusPageFree } from "./status";
 import { landingPage } from "./landing";
 import { verifyGithubWebhookSignature, handleGithubWebhookEvent } from "./githubApp";
 import { handleGithubLogin, handleGithubCallback, handleLogout, getSessionCookieValue } from "./auth";
@@ -120,8 +120,15 @@ async function handleStatusPage(req: Request, env: Env): Promise<Response> {
       : null;
     html = statusPageActive(repo, row, portalUrl, env.PRICE_LABEL || "Single repo — subscription");
   } else {
-    const checkoutUrl = `${env.CHECKOUT_BASE_URL}/checkout?repo=${encodeURIComponent(repo)}`;
-    html = statusPageNeedsActivation(repo, checkoutUrl, env.PRICE_AMOUNT || "$9", env.PRICE_UNIT || "per month");
+    // No paid subscription on file. If we know from GitHub App install
+    // data that this repo is public, it's simply free -- not unlicensed.
+    const isPrivate = await isRepoPrivate(env.DB, repo);
+    if (isPrivate === false) {
+      html = statusPageFree(repo);
+    } else {
+      const checkoutUrl = `${env.CHECKOUT_BASE_URL}/checkout?repo=${encodeURIComponent(repo)}`;
+      html = statusPageNeedsActivation(repo, checkoutUrl, env.PRICE_AMOUNT || "$9", env.PRICE_UNIT || "per month");
+    }
   }
 
   return new Response(html, { headers: { "Content-Type": "text/html; charset=utf-8" } });
@@ -179,9 +186,13 @@ async function handleDashboardPage(req: Request, env: Env): Promise<Response> {
     return new Response(null, { status: 302, headers: { Location: "/auth/github/login" } });
   }
 
-  const repoSlugs = await getReposForUser(env.DB, session.userId);
+  const userRepos = await getReposForUser(env.DB, session.userId);
   const repos = await Promise.all(
-    repoSlugs.map(async (repo) => ({ repo, row: await getRepo(env.DB, repo) }))
+    userRepos.map(async (r) => ({
+      repo: r.repo,
+      isPrivate: r.is_private === 1,
+      row: await getRepo(env.DB, r.repo),
+    }))
   );
 
   // login/avatar aren't stored on the session row -- look them up once via

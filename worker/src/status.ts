@@ -138,6 +138,20 @@ export function statusPageActive(
   return shell(repo, dateline, body);
 }
 
+export function statusPageFree(repo: string): string {
+  const dateline = new Date().toLocaleDateString("en-GB", { day: "2-digit", month: "short", year: "numeric" });
+
+  const body = `
+  <div class="status-row">
+    <span class="dot" style="background:#2f7d4f;box-shadow:0 0 0 4px color-mix(in srgb, #2f7d4f 16%, transparent)"></span>
+    <span class="status-label" style="color:#2f7d4f">Free</span>
+    <span class="status-note">— public repo, no subscription needed</span>
+  </div>
+  <p class="lede">This repo is public, so DocDrifter checks every pull request for free. No action needed here.</p>`;
+
+  return shell(repo, dateline, body);
+}
+
 export function statusPageNeedsActivation(
   repo: string,
   checkoutUrl: string,
