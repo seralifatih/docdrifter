@@ -85,7 +85,7 @@ section { padding: calc(2.2 * var(--leading)) 0; }
 <body>
 
 <nav>
-  <span class="nav-brand">DocDrifter</span>
+  <a class="nav-brand" href="/">DocDrifter</a>
   <a href="#how">How it works</a>
   <a href="#evidence">Evidence</a>
   <a href="#pricing">Pricing</a>
