@@ -3,11 +3,13 @@
 // import it below, add one line to POSTS. Newest first.
 
 import measuringDocsDrift from "../content/posts/measuring-docs-drift-detection.md";
+import perRepoSeats from "../content/posts/per-repo-seats.md";
 import scheduledChecksAndDriftScore from "../content/posts/scheduled-checks-and-drift-score.md";
 import silenceIsTheFeature from "../content/posts/silence-is-the-feature.md";
 import { parsePost, type Post } from "./markdown";
 
 const RAW_POSTS: Array<{ slug: string; raw: string }> = [
+  { slug: "per-repo-seats", raw: perRepoSeats },
   { slug: "scheduled-checks-and-drift-score", raw: scheduledChecksAndDriftScore },
   { slug: "silence-is-the-feature", raw: silenceIsTheFeature },
   { slug: "measuring-docs-drift-detection", raw: measuringDocsDrift },
